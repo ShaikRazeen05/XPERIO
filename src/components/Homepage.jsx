@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Heart } from 'lucide-react'; // Assuming Heart is used for favorites
-
+import { Star, MapPin, Clock } from 'lucide-react';
 // Basic implementation of StarBorder component to resolve import error
 // This component wraps its children and applies some styling,
 // mimicking the original usage with 'as' prop for flexibility.
@@ -388,12 +388,31 @@ export function Homepage() {
                                             className={`h-6 w-6 cursor-pointer ${fav['Hyderabadi Biryani'] ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-500'}`}
                                             onClick={() => handleFav('Hyderabadi Biryani')}
                                         />
+                          
                                     </h3>
                                     <p className="text-gray-300 text-sm mb-2">Hyderabad, Telangana</p>
-                                    <p className="mt-3 font-extrabold text-green-400 text-xl">₹150</p>
+                                    <div className="flex items-center justify-between space-x-6 text-white text-sm">
+  {/* Rating */}
+  <div className="flex items-center space-x-1">
+    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+    <span>4.9</span>
+  </div>
+
+  {/* Distance */}
+  <div className="flex items-center space-x-1">
+    <MapPin className="w-4 h-4 text-white" />
+    <span>0.8 km</span>
+  </div>
+
+  {/* Status */}
+  <div className="flex items-center space-x-1">
+    <Clock className="w-4 h-4 text-white" />
+    <span>Open</span>
+  </div>
+</div>
+
                                 </div>
                             </div>
-
                             {/* Food Card 2 */}
                             <div className="bg-gray-700 rounded-[2.5rem] p-6 w-[280px] flex-shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
                                 <div className="h-44 overflow-hidden rounded-2xl mb-4">
@@ -408,7 +427,26 @@ export function Homepage() {
                                         />
                                     </h3>
                                     <p className="text-gray-300 text-sm mb-2">Mumbai, Maharashtra</p>
-                                    <p className="mt-3 font-extrabold text-green-400 text-xl">₹40</p>
+                                    <div className="flex items-center justify-between space-x-6 text-white text-sm">
+  {/* Rating */}
+  <div className="flex items-center space-x-1">
+    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+    <span>4.9</span>
+  </div>
+
+  {/* Distance */}
+  <div className="flex items-center space-x-1">
+    <MapPin className="w-4 h-4 text-white" />
+    <span>0.8 km</span>
+  </div>
+
+  {/* Status */}
+  <div className="flex items-center space-x-1">
+    <Clock className="w-4 h-4 text-white" />
+    <span>Open</span>
+  </div>
+</div>
+
                                 </div>
                             </div>
 
@@ -426,7 +464,26 @@ export function Homepage() {
                                         />
                                     </h3>
                                     <p className="text-gray-300 text-sm mb-2">Delhi, NCR</p>
-                                    <p className="mt-3 font-extrabold text-green-400 text-xl">₹60</p>
+                                    <div className="flex items-center justify-between space-x-6 text-white text-sm">
+  {/* Rating */}
+  <div className="flex items-center space-x-1">
+    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+    <span>4.9</span>
+  </div>
+
+  {/* Distance */}
+  <div className="flex items-center space-x-1">
+    <MapPin className="w-4 h-4 text-white" />
+    <span>0.8 km</span>
+  </div>
+
+  {/* Status */}
+  <div className="flex items-center space-x-1">
+    <Clock className="w-4 h-4 text-white" />
+    <span>Open</span>
+  </div>
+</div>
+
                                 </div>
                             </div>
 
@@ -444,7 +501,26 @@ export function Homepage() {
                                         />
                                     </h3>
                                     <p className="text-gray-300 text-sm mb-2">Bengaluru, Karnataka</p>
-                                    <p className="mt-3 font-extrabold text-green-400 text-xl">₹80</p>
+                                    <div className="flex items-center justify-between space-x-6 text-white text-sm">
+  {/* Rating */}
+  <div className="flex items-center space-x-1">
+    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+    <span>4.9</span>
+  </div>
+
+  {/* Distance */}
+  <div className="flex items-center space-x-1">
+    <MapPin className="w-4 h-4 text-white" />
+    <span>0.8 km</span>
+  </div>
+
+  {/* Status */}
+  <div className="flex items-center space-x-1">
+    <Clock className="w-4 h-4 text-white" />
+    <span>Open</span>
+  </div>
+</div>
+
                                 </div>
                             </div>
 
@@ -462,7 +538,26 @@ export function Homepage() {
                                         />
                                     </h3>
                                     <p className="text-gray-300 text-sm mb-2">Kashmir, J&K</p>
-                                    <p className="mt-3 font-extrabold text-green-400 text-xl">₹300</p>
+                                    <div className="flex items-center justify-between space-x-6 text-white text-sm">
+  {/* Rating */}
+  <div className="flex items-center space-x-1">
+    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+    <span>4.9</span>
+  </div>
+
+  {/* Distance */}
+  <div className="flex items-center space-x-1">
+    <MapPin className="w-4 h-4 text-white" />
+    <span>0.8 km</span>
+  </div>
+
+  {/* Status */}
+  <div className="flex items-center space-x-1">
+    <Clock className="w-4 h-4 text-white" />
+    <span>Open</span>
+  </div>
+</div>
+
                                 </div>
                             </div>
                         </div>
