@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Heart } from 'lucide-react'; // Assuming Heart is used for favorites
 import { Star, MapPin, Clock,Send } from 'lucide-react';
 import ImageTrail from './ImageTrail.jsx'
+import {useNavigate} from 'react-router-dom';
+
 // Basic implementation of StarBorder component to resolve import error
 // This component wraps its children and applies some styling,
 // mimicking the original usage with 'as' prop for flexibility.
@@ -9,7 +11,7 @@ const StarBorder = ({ children, as: Component = 'div', color = 'gray', speed = '
     // Tailwind classes for styling based on props
     const baseClasses = "relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800";
     const spanClasses = "relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0";
-
+  
     return (
         <Component className={baseClasses} {...props}>
             <span className={spanClasses}>
@@ -30,7 +32,7 @@ export function Homepage() {
     const [showCulture, setShowCulture] = useState(false); // Added missing state for Culture modal
 
     const [loggedIn, setLoggedIn] = useState(JSON.parse(sessionStorage.getItem("loggedIn") || "false"));
-
+  const navigate = useNavigate();
     const favourites = {
         "Hyderabadi Biryani": false,
         "Vada Pav": false,
@@ -175,24 +177,7 @@ export function Homepage() {
                 
             }}
         >
-          <div className="absolute  h-screen w-screen">
-            <ImageTrail
-              
-              items={[
-                'https://picsum.photos/id/287/300/300',
-                'https://picsum.photos/id/1001/300/300',
-                'https://picsum.photos/id/1025/300/300',
-                'https://picsum.photos/id/1026/300/300',
-                'https://picsum.photos/id/1027/300/300',
-                'https://picsum.photos/id/1028/300/300',
-                'https://picsum.photos/id/1029/300/300',
-                'https://picsum.photos/id/1030/300/300',
-                // ...
-              ]}
-              variant={4}
-            />
-          </div>
-
+          
             {/* Full-screen overlay directly on top of the background image */}
             {/* This layer provides the overall dimming effect over the background image */}
             <div
@@ -216,7 +201,7 @@ export function Homepage() {
 
                 {/* Header Section - Integrated from both designs */}
                 {/* This header is now part of the full-page hero section */}
-                <header className="relative z-10 flex justify-between items-center mb-16">
+                <header className="relative z-20 flex justify-between items-center mb-16">
                     {/* Xperio Logo */}
                     <div className="text-white text-3xl font-bold tracking-wider">
                         Xperio
@@ -237,7 +222,7 @@ export function Homepage() {
                         <StarBorder as="button" color="sky" speed="2s" onClick={(e) => { e.stopPropagation(); setShowPremium(true); }}>
                             Premium
                         </StarBorder>
-                        <StarBorder as="button" color="cyan" speed="2s" onClick={(e) => { e.stopPropagation(); setShowFood(true); }}>
+                        <StarBorder as="button" color="cyan" speed="2s" onClick={(e) => { e.stopPropagation(); console.log(1);navigate('/food'); }}>
                             Food
                         </StarBorder>
                         <StarBorder as="button" color="cyan" speed="2s" onClick={(e) => { e.stopPropagation(); setShowCulture(true); }}>
@@ -276,6 +261,24 @@ export function Homepage() {
                     >
                        Xperio
                     </h1>
+                    <div className="absolute  h-screen w-screen ">
+            <ImageTrail
+              
+              items={[
+                'https://picsum.photos/id/287/300/300',
+                'https://picsum.photos/id/1001/300/300',
+                'https://picsum.photos/id/1025/300/300',
+                'https://picsum.photos/id/1026/300/300',
+                'https://picsum.photos/id/1027/300/300',
+                'https://picsum.photos/id/1028/300/300',
+                'https://picsum.photos/id/1029/300/300',
+                'https://picsum.photos/id/1030/300/300',
+                // ...
+              ]}
+              variant={4}
+            />
+          </div>
+
                     <h1 className="text-7xl sm:text-8xl md:text-9xl font-extrabold tracking-widest leading-none -mt-4"
                         style={{
                             textShadow: '0 0 15px rgba(0,0,0,0.5)',
