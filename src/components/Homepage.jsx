@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Heart } from 'lucide-react'; // Assuming Heart is used for favorites
-// import DarkVeil from './DarkVeil'; // Removed as it's not used in the provided JSX and causing import issues
 
 // Basic implementation of StarBorder component to resolve import error
 // This component wraps its children and applies some styling,
@@ -29,12 +28,6 @@ export function Homepage() {
     const [showFood, setShowFood] = useState(false); // Added missing state for Food modal
     const [showCulture, setShowCulture] = useState(false); // Added missing state for Culture modal
 
-    // Removed slideshow-related states as the hero section is replaced
-    // const [dummy,setDummy] = useState(true);
-    // const slides = [...];
-    // const [currentSlide, setCurrentSlide] = useState(0);
-    // const [isImageLoaded, setIsImageLoaded] = useState(false);
-
     const [loggedIn, setLoggedIn] = useState(JSON.parse(sessionStorage.getItem("loggedIn") || "false"));
 
     const favourites = {
@@ -56,9 +49,18 @@ export function Homepage() {
     });
 
     function handleExploreClick() {
+        // Scroll to the categories section
         const exploreSection = document.getElementById("xperio-categories");
         if (exploreSection) {
             exploreSection.scrollIntoView({ behavior: "smooth" });
+        }
+    }
+
+    // New function to scroll to dashboard
+    function handleDashboardClick() {
+        const dashboardSection = document.getElementById("user-dashboard");
+        if (dashboardSection) {
+            dashboardSection.scrollIntoView({ behavior: "smooth" });
         }
     }
 
@@ -73,7 +75,6 @@ export function Homepage() {
         sessionStorage.removeItem("loggedIn");
         setShowForm(false);
         setLoggedIn(false);
-        // setDummy(!dummy); // Keep if dummy is still used elsewhere
     }
 
     function handleFav(name) {
@@ -81,9 +82,6 @@ export function Homepage() {
             ...prev,
             [name]: !prev[name]
         }));
-        // Corrected: sessionStorage.setItem expects stringified value, and setFav is the state setter, not the value
-        // You should pass the updated 'fav' state to sessionStorage.
-        // The useEffect below handles saving 'fav' to sessionStorage.
     }
 
     const testimonials = [
@@ -130,25 +128,9 @@ export function Homepage() {
     const [signedUp, setSignedUp] = useState(false);
     const [emailError, setEmailError] = useState('');
 
-    // Effect to save favorites to sessionStorage whenever 'fav' changes
     useEffect(() => {
         sessionStorage.setItem("fav", JSON.stringify(fav));
     }, [fav]);
-
-    // Removed slideshow-related useEffect
-    // useEffect(() => {
-    //     const img = new Image();
-    //     img.src = slides[0];
-    //     img.onload = () => setIsImageLoaded(true);
-    // }, []);
-
-    // Removed slideshow-related useEffect
-    // useEffect(() => {
-    //     const interval = setInterval(() => {
-    //         setCurrentSlide((prev) => (prev + 1) % slides.length);
-    //     }, 4000);
-    //     return () => clearInterval(interval);
-    // }, [slides.length]);
 
     function showPrevious() {
         setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
@@ -179,41 +161,44 @@ export function Homepage() {
         setTimeout(() => setSignedUp(false), 4000);
     };
 
-    // Background image for the hero section
-    const heroBackgroundImage = 'https://placehold.co/1200x800/222831/EEEEEE?text=Background';
+    // Background image for the hero section - using a more visible placeholder
+    const heroBackgroundImage = 'https://placehold.co/1920x1080/4A4A4A/FFFFFF?text=YOUR+BACKGROUND+IMAGE';
 
     return (
-        <div onClick={() => setShowForm(false)} className="min-h-screen font-inter relative">
-            {/* Full-screen Background Image Layer (for the hero section) */}
-            <div
-                className="absolute inset-0 z-0" // Position absolutely to cover the entire viewport
-                style={{
-                    backgroundImage: `url(${heroBackgroundImage})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    filter: 'brightness(0.7)' // Slightly dim the background image itself
-                }}
-            ></div>
+        // Outermost div now holds the background image and the main overlay
+        
+        <div
+            className="min-h-screen relative font-inter"
+            style={{
+                backgroundImage: `url(${heroBackgroundImage})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+            }}
+        >import ImageTrail from './ImageTrail;'
 
-            {/* Full-screen Overlay Layer (over the background image, but under the main content box) */}
+            {/* Full-screen overlay directly on top of the background image */}
+            {/* This layer provides the overall dimming effect over the background image */}
             <div
-                className="absolute inset-0 z-10" // Position absolutely, above the background image
+                className="absolute inset-0 z-0" // z-0 to be behind the main content box
                 style={{
-                    background: 'linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.3), rgba(0,0,0,0.6))', // Darker gradient for the overall page
+                    background: 'linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.4), rgba(0,0,0,0.7))', // Stronger gradient for visibility
                 }}
             ></div>
 
             {/* Main content container (the bordered box from Tourism example, now the hero section) */}
-            <div className="relative z-20 w-full max-w-6xl h-[700px] bg-black bg-opacity-40 rounded-xl shadow-2xl overflow-hidden border border-white border-opacity-30 flex flex-col p-6 sm:p-10 mx-auto mt-8">
-                {/* Inner Overlay for the content box (subtle effect within the box) */}
+            {/* This box is positioned relative to the viewport and sits on top of the full-screen overlay */}
+            <div className="relative z-10 w-full min-h-screen bg-black bg-opacity-40 rounded-none shadow-none overflow-hidden border-none flex flex-col p-6 sm:p-10">
+                {/* Inner Overlay for the content box (subtle effect within the box itself) */}
+                {/* This is for the subtle gradient *inside* the main content box */}
                 <div
-                    className="absolute inset-0 z-0" // Position absolutely to cover the inner container
+                    className="absolute inset-0 z-0" // z-0 relative to its parent (the main content box)
                     style={{
-                        background: 'linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.05), rgba(0,0,0,0.2))', // Lighter gradient for the inner box
+                        background: 'linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.05), rgba(0,0,0,0.2))',
                     }}
                 ></div>
 
                 {/* Header Section - Integrated from both designs */}
+                {/* This header is now part of the full-page hero section */}
                 <header className="relative z-10 flex justify-between items-center mb-16">
                     {/* Xperio Logo */}
                     <div className="text-white text-3xl font-bold tracking-wider">
@@ -224,8 +209,9 @@ export function Homepage() {
                     <nav className="flex items-center space-x-4 text-white text-lg font-medium">
                         {/* Tourism links (optional, can be removed if not needed) */}
                         <a href="#" className="hover:text-gray-300 transition-colors hidden sm:block">HOME</a>
-                      
-
+                        <a href="#" className="hover:text-gray-300 transition-colors hidden sm:block">VIDEO</a>
+                        <a href="#" className="hover:text-gray-300 transition-colors hidden sm:block">PRODUCT</a>
+                        <a href="#" className="hover:text-gray-300 transition-colors hidden sm:block">COMPANY</a>
 
                         {/* Xperio Buttons */}
                         <StarBorder as="button" color="cyan" speed="2s" onClick={(e) => { e.stopPropagation(); setShowTranslator(true); }}>
@@ -240,14 +226,20 @@ export function Homepage() {
                         <StarBorder as="button" color="cyan" speed="2s" onClick={(e) => { e.stopPropagation(); setShowCulture(true); }}>
                             Culture
                         </StarBorder>
+                        {/* New Dashboard link - visible only when logged in */}
+                        {loggedIn && (
+                            <StarBorder as="button" color="green" speed="2s" onClick={(e) => { e.stopPropagation(); handleDashboardClick(); }}>
+                                Dashboard
+                            </StarBorder>
+                        )}
                     </nav>
 
                     {/* User Icon */}
-                    <div className="relative z-[1000] ml-4"> {/* Adjusted z-index for icon to be clickable */}
+                    <div className="relative z-[1000] ml-4">
                         <img
                             src={userIcon}
-                            onMouseOver={() => setUserIcon("pictures_homepage/user.png")} // Changed hover image to user.png
-                            onMouseOut={() => setUserIcon("pictures_homepage/user1.png")} // Changed default image to user1.png
+                            onMouseOver={() => setUserIcon("pictures_homepage/user.png")}
+                            onMouseOut={() => setUserIcon("pictures_homepage/user1.png")}
                             onClick={(e) => { e.stopPropagation(); setShowForm(true); console.log(loggedIn); }}
                             alt="User Icon"
                             className="w-[50px] h-[50px] rounded-full object-cover cursor-pointer hover:scale-110 transition-transform"
@@ -265,7 +257,7 @@ export function Homepage() {
                             WebkitTextFillColor: 'transparent',
                         }}
                     >
-                        DAYTIME
+                       Xperio
                     </h1>
                     <h1 className="text-7xl sm:text-8xl md:text-9xl font-extrabold tracking-widest leading-none -mt-4"
                         style={{
@@ -275,9 +267,8 @@ export function Homepage() {
                             WebkitTextFillColor: 'transparent',
                         }}
                     >
-                        SKY
+                        – Taste culture. Explore stories.
                     </h1>
-                    {/* Re-added the Explore Now button */}
                     <button
                         onClick={handleExploreClick}
                         className="mt-8 inline-block px-8 py-4 bg-black bg-opacity-60 text-white font-bold rounded-full hover:bg-black hover:bg-opacity-80 transition-all duration-300 shadow-lg animate-bounce-slow"
@@ -307,12 +298,60 @@ export function Homepage() {
             </div>
 
             {/* All other sections of your original Homepage component */}
-            <div className="relative z-30 bg-white"> {/* Added a white background to ensure sections are visible */}
+            {/* This div needs to be outside the hero section to scroll independently */}
+            <div className="relative z-20 bg-gray-900 text-white">
+                {/* Dashboard Section - Visible only when logged in */}
+                {loggedIn && (
+                    <section id="user-dashboard" className="bg-gray-800 rounded-3xl shadow-2xl p-8 md:p-12 my-12 mx-auto max-w-[1400px] transform transition-transform duration-500 hover:scale-[1.01]">
+                        <h2 className="text-4xl font-extrabold mb-6 text-white text-center">Your Xperio Dashboard</h2>
+                        <p className="text-lg text-gray-300 mb-8 text-center max-w-2xl mx-auto">
+                            Welcome back! Here's a quick overview of your personalized Xperio experience.
+                        </p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {/* Dashboard Card 1: Favorites Summary */}
+                            <div className="bg-gray-700 rounded-xl p-6 shadow-lg flex flex-col items-center text-center">
+                                <Heart className="h-12 w-12 text-red-400 mb-4" />
+                                <h3 className="text-xl font-bold text-white mb-2">My Favorites</h3>
+                                <p className="text-gray-300">You have {Object.values(fav).filter(f => f).length} favorite places saved!</p>
+                                <button className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-300">
+                                    View Favorites
+                                </button>
+                            </div>
+
+                            {/* Dashboard Card 2: Upcoming Trips (Dummy) */}
+                            <div className="bg-gray-700 rounded-xl p-6 shadow-lg flex flex-col items-center text-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-yellow-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0L6.343 16.657m10.614-10.614L13.414 3.1a1.998 1.998 0 00-2.828 0L6.343 6.343m10.614 10.614L17.657 16.657M6.343 6.343L6.343 6.343m0 0L3.1 9.586a1.998 1.998 0 000 2.828l4.243 4.243m-4.243-4.243L3.1 9.586m0 0L6.343 6.343m0 0l4.243 4.243m-4.243-4.243L6.343 6.343m0 0L9.586 3.1a1.998 1.998 0 012.828 0L16.657 6.343m-4.243 4.243L12 12m0 0l4.243 4.243m-4.243-4.243L12 12m0 0L9.586 15.414a1.998 1.998 0 00-2.828 0L3.1 19.657" />
+                                </svg>
+                                <h3 className="text-xl font-bold text-white mb-2">Upcoming Trips</h3>
+                                <p className="text-gray-300">No upcoming trips planned yet. Start exploring!</p>
+                                <button className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-300">
+                                    Plan a Trip
+                                </button>
+                            </div>
+
+                            {/* Dashboard Card 3: Profile Settings */}
+                            <div className="bg-gray-700 rounded-xl p-6 shadow-lg flex flex-col items-center text-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-green-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.942 3.333.999 2.401 2.401a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.942 1.543-.999 3.333-2.401 2.401a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.942-3.333-.999-2.401-2.401a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.942-1.543.999-3.333 2.401-2.401a1.724 1.724 0 002.572-1.065z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <h3 className="text-xl font-bold text-white mb-2">Profile Settings</h3>
+                                <p className="text-gray-300">Manage your account details and preferences.</p>
+                                <button className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-300">
+                                    Edit Profile
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+                )}
+
                 {/* Featured Sections */}
                 <div id="xperio-categories" className="p-8 space-y-20">
-                    <section className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 relative overflow-hidden transform transition-transform duration-500 hover:scale-[1.01]">
-                        <h2 className="text-4xl font-extrabold mb-4 text-gray-800 text-center">Xperio Food Delights</h2>
-                        <p className="text-lg text-gray-600 mb-10 text-center max-w-2xl mx-auto">
+                    <section className="bg-gray-800 rounded-3xl shadow-2xl p-8 md:p-12 relative overflow-hidden transform transition-transform duration-500 hover:scale-[1.01]">
+                        <h2 className="text-4xl font-extrabold mb-4 text-white text-center">Xperio Food Delights</h2>
+                        <p className="text-lg text-gray-300 mb-10 text-center max-w-2xl mx-auto">
                             Savor the authentic tastes of India's diverse street food scene.
                         </p>
 
@@ -338,106 +377,126 @@ export function Homepage() {
                             }}
                         >
                             {/* Food Card 1 */}
-                            <div className="bg-[#E1F6F4] rounded-[2.5rem] p-6 w-[280px] flex-shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                            <div className="bg-gray-700 rounded-[2.5rem] p-6 w-[280px] flex-shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
                                 <div className="h-44 overflow-hidden rounded-2xl mb-4">
                                     <img src="pictures_homepage/biryani.jpg" alt="Hyderabadi Biryani" className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300" />
                                 </div>
                                 <div className="text-center">
-                                    <h3 className="text-xl font-bold text-gray-800 flex items-center justify-center gap-2 mb-1">
+                                    <h3 className="text-xl font-bold text-white flex items-center justify-center gap-2 mb-1">
                                         Hyderabadi Biryani
                                         <Heart
                                             className={`h-6 w-6 cursor-pointer ${fav['Hyderabadi Biryani'] ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-500'}`}
                                             onClick={() => handleFav('Hyderabadi Biryani')}
                                         />
                                     </h3>
-                                    <p className="text-gray-600 text-sm mb-2">Hyderabad, Telangana</p>
-                                    <p className="mt-3 font-extrabold text-green-700 text-xl">₹150</p>
+                                    <p className="text-gray-300 text-sm mb-2">Hyderabad, Telangana</p>
+                                    <p className="mt-3 font-extrabold text-green-400 text-xl">₹150</p>
                                 </div>
                             </div>
 
                             {/* Food Card 2 */}
-                            <div className="bg-[#FAF0F4] rounded-[2.5rem] p-6 w-[280px] flex-shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                            <div className="bg-gray-700 rounded-[2.5rem] p-6 w-[280px] flex-shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
                                 <div className="h-44 overflow-hidden rounded-2xl mb-4">
                                     <img src="pictures_homepage/vadapav.jpg" alt="Vada Pav" className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300" />
                                 </div>
                                 <div className="text-center">
-                                    <h3 className="text-xl font-bold text-gray-800 flex items-center justify-center gap-2 mb-1">
+                                    <h3 className="text-xl font-bold text-white flex items-center justify-center gap-2 mb-1">
                                         Mumbai Vada Pav
                                         <Heart
                                             className={`h-6 w-6 cursor-pointer ${fav['Vada Pav'] ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-500'}`}
                                             onClick={() => handleFav('Vada Pav')}
                                         />
                                     </h3>
-                                    <p className="text-gray-600 text-sm mb-2">Mumbai, Maharashtra</p>
-                                    <p className="mt-3 font-extrabold text-green-700 text-xl">₹40</p>
+                                    <p className="text-gray-300 text-sm mb-2">Mumbai, Maharashtra</p>
+                                    <p className="mt-3 font-extrabold text-green-400 text-xl">₹40</p>
                                 </div>
                             </div>
 
                             {/* Food Card 3 */}
-                            <div className="bg-[#FFF3E6] rounded-[2.5rem] p-6 w-[280px] flex-shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                            <div className="bg-gray-700 rounded-[2.5rem] p-6 w-[280px] flex-shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
                                 <div className="h-44 overflow-hidden rounded-2xl mb-4">
                                     <img src="pictures_homepage/chat.jpg" alt="Delhi Chaat" className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300" />
                                 </div>
                                 <div className="text-center">
-                                    <h3 className="text-xl font-bold text-gray-800 flex items-center justify-center gap-2 mb-1">
+                                    <h3 className="text-xl font-bold text-white flex items-center justify-center gap-2 mb-1">
                                         Delhi Street Chaat
                                         <Heart
                                             className={`h-6 w-6 cursor-pointer ${fav['Delhi Chaat'] ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-500'}`}
                                             onClick={() => handleFav('Delhi Chaat')}
                                         />
                                     </h3>
-                                    <p className="text-gray-600 text-sm mb-2">Delhi, NCR</p>
-                                    <p className="mt-3 font-extrabold text-green-700 text-xl">₹60</p>
+                                    <p className="text-gray-300 text-sm mb-2">Delhi, NCR</p>
+                                    <p className="mt-3 font-extrabold text-green-400 text-xl">₹60</p>
                                 </div>
                             </div>
 
                             {/* Food Card 4 */}
-                            <div className="bg-[#E6F9F3] rounded-[2.5rem] p-6 w-[280px] flex-shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                            <div className="bg-gray-700 rounded-[2.5rem] p-6 w-[280px] flex-shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
                                 <div className="h-44 overflow-hidden rounded-2xl mb-4">
                                     <img src="pictures_homepage/dosa.jpg" alt="Masala Dosa" className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300" />
                                 </div>
                                 <div className="text-center">
-                                    <h3 className="text-xl font-bold text-gray-800 flex items-center justify-center gap-2 mb-1">
+                                    <h3 className="text-xl font-bold text-white flex items-center justify-center gap-2 mb-1">
                                         Masala Dosa
                                         <Heart
                                             className={`h-6 w-6 cursor-pointer ${fav['Masala Dosa'] ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-500'}`}
                                             onClick={() => handleFav('Masala Dosa')}
                                         />
                                     </h3>
-                                    <p className="text-gray-600 text-sm mb-2">Bengaluru, Karnataka</p>
-                                    <p className="mt-3 font-extrabold text-green-700 text-xl">₹80</p>
+                                    <p className="text-gray-300 text-sm mb-2">Bengaluru, Karnataka</p>
+                                    <p className="mt-3 font-extrabold text-green-400 text-xl">₹80</p>
                                 </div>
                             </div>
 
                             {/* Food Card 5 */}
-                            <div className="bg-[#F8F3ED] rounded-[2.5rem] p-6 w-[280px] flex-shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                            <div className="bg-gray-700 rounded-[2.5rem] p-6 w-[280px] flex-shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
                                 <div className="h-44 overflow-hidden rounded-2xl mb-4">
                                     <img src="pictures_homepage/rogan.png" alt="Rogan Josh" className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300" />
                                 </div>
                                 <div className="text-center">
-                                    <h3 className="text-xl font-bold text-gray-800 flex items-center justify-center gap-2 mb-1">
+                                    <h3 className="text-xl font-bold text-white flex items-center justify-center gap-2 mb-1">
                                         Kashmiri Rogan Josh
                                         <Heart
                                             className={`h-6 w-6 cursor-pointer ${fav['Rogan Josh'] ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-500'}`}
                                             onClick={() => handleFav('Rogan Josh')}
                                         />
                                     </h3>
-                                    <p className="text-gray-600 text-sm mb-2">Kashmir, J&K</p>
-                                    <p className="mt-3 font-extrabold text-green-700 text-xl">₹300</p>
+                                    <p className="text-gray-300 text-sm mb-2">Kashmir, J&K</p>
+                                    <p className="mt-3 font-extrabold text-green-400 text-xl">₹300</p>
                                 </div>
                             </div>
                         </div>
                     </section>
 
-                    <section className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 transform transition-transform duration-500 hover:scale-[1.01]">
-                        <h2 className="text-4xl font-extrabold mb-4 text-gray-800 text-center">
+                    <section className="bg-gray-800 rounded-3xl shadow-2xl p-8 md:p-12 transform transition-transform duration-500 hover:scale-[1.01]">
+                        <h2 className="text-4xl font-extrabold mb-4 text-white text-center">
                             Xperio Cultural Immersion
                         </h2>
-                        <p className="text-lg text-gray-600 mb-10 text-center max-w-2xl mx-auto">
+                        <p className="text-lg text-gray-300 mb-10 text-center max-w-2xl mx-auto">
                             Dive deep into the vibrant traditions and captivating performances of India.
                         </p>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                        {/* Horizontal Scrollable Cards - Now styled like Food Delights */}
+                        <div
+                            className="flex gap-8 overflow-x-auto scroll-smooth cursor-grab active:cursor-grabbing py-4 px-2 -mx-2 custom-scrollbar"
+                            onMouseDown={(e) => {
+                                const container = e.currentTarget;
+                                let startX = e.pageX - container.offsetLeft;
+                                let scrollLeft = container.scrollLeft;
+
+                                const onMouseMove = (ev) => {
+                                    const x = ev.pageX - container.offsetLeft;
+                                    const walk = (x - startX) * 1.5;
+                                    container.scrollLeft = scrollLeft - walk;
+                                };
+                                const onMouseUp = () => {
+                                    container.removeEventListener("mousemove", onMouseMove);
+                                    container.removeEventListener("mouseup", onMouseUp);
+                                };
+                                container.addEventListener("mousemove", onMouseMove);
+                                container.addEventListener("mouseup", onMouseUp);
+                            }}
+                        >
                             {/* CULTURE CARD TEMPLATE */}
                             {[
                                 {
@@ -479,30 +538,32 @@ export function Homepage() {
                             ].map((item) => (
                                 <div
                                     key={item.title}
-                                    className="bg-gray-100 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                                    className="bg-gray-700 p-6 rounded-[2.5rem] w-[280px] flex-shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
                                 >
-                                    <div className="h-52 overflow-hidden rounded-xl mb-4">
+                                    <div className="h-44 overflow-hidden rounded-2xl mb-4">
                                         <img
                                             src={item.image}
                                             alt={item.title}
                                             className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
                                         />
                                     </div>
-                                    <h3 className="text-xl font-semibold text-gray-800 flex items-center gap-2 mb-1">
-                                        {item.title}
-                                        <Heart
-                                            className={`h-6 w-6 cursor-pointer ${
-                                                fav[item.title]
-                                                    ? "fill-red-500 text-red-500"
-                                                    : "text-gray-400 hover:text-red-500"
-                                            }`}
-                                            onClick={() => handleFav(item.title)}
-                                        />
-                                    </h3>
-                                    <p className="text-gray-600 text-sm mb-2">{item.location}</p>
-                                    <p className="mt-3 font-bold text-indigo-700 text-md">
-                                        {item.description}
-                                    </p>
+                                    <div className="text-center">
+                                        <h3 className="text-xl font-bold text-white flex items-center justify-center gap-2 mb-1">
+                                            {item.title}
+                                            <Heart
+                                                className={`h-6 w-6 cursor-pointer ${
+                                                    fav[item.title]
+                                                        ? "fill-red-500 text-red-500"
+                                                        : "text-gray-400 hover:text-red-500"
+                                                }`}
+                                                onClick={() => handleFav(item.title)}
+                                            />
+                                        </h3>
+                                        <p className="text-gray-300 text-sm mb-2">{item.location}</p>
+                                        <p className="mt-3 font-bold text-indigo-400 text-md">
+                                            {item.description}
+                                        </p>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -626,77 +687,74 @@ export function Homepage() {
                     </div>
                 )}
 
-                {/* Social Proof Section */}
-                <section className="bg-[#f0f4eb] py-16 px-4 text-center">
-                    <h2 className="text-3xl font-bold mb-2 text-gray-800">Social proof? Here.</h2>
-                    <p className="text-gray-600 mb-10">
-                        From exploring local gems to global adventures ,2000+ happy clients and still counting.
-                    </p>
+          <section className="bg-gray-800 py-16 px-4 text-center">
+  <h2 className="text-3xl font-bold mb-2 text-white">Social proof? Here.</h2>
+  <p className="text-gray-300 mb-10">
+    From exploring local gems to global adventures, 2000+ happy clients and still counting.
+  </p>
 
-                    <div className="flex flex-wrap justify-center gap-6 max-w-7xl mx-auto">
-                        {/* Testimonial Cards */}
-                        {testimonials.map((testimonial, index) => (
-                            <div
-                                key={index}
-                                className="bg-white rounded-lg shadow-md p-6 w-80 transform rotate-[-3deg] hover:rotate-0 hover:scale-105 transition-all duration-300"
-                                style={{ transform: `rotate(${index % 2 === 0 ? -3 : 2}deg)` }} // Alternating rotation
-                            >
-                                <p className="text-gray-800 mb-6">
-                                    "{testimonial.message}"
-                                </p>
-                                <div className="flex items-center gap-3">
-                                    <img
-                                        src={`https://randomuser.me/api/portraits/${index % 2 === 0 ? 'men' : 'women'}/${30 + index}.jpg`} // Dynamic user images
-                                        alt={testimonial.name}
-                                        className="w-10 h-10 rounded-full object-cover"
-                                    />
-                                    <div className="text-left">
-                                        <p className="font-semibold text-sm text-gray-700">{testimonial.name}</p>
-                                        <p className="text-xs text-gray-500">
-                                            {/* Placeholder for title, if available in testimonials data */}
-                                            {testimonial.name === "Rai M." && "Founder of ArtisanMarket"}
-                                            {testimonial.name === "Mike P." && "GreenFuture Foundation"}
-                                            {testimonial.name === "Sadiya" && "Employee NovaTech"}
-                                            {testimonial.name === "Sara L." && "Influencer"}
-                                            {testimonial.name === "Jack" && "Teacher"}
-                                            {testimonial.name === "Raj." && "Travel influencer"}
-                                            {/* Default if no specific title */}
-                                            {!(testimonial.name === "Rai M." || testimonial.name === "Mike P." || testimonial.name === "Sadiya" || testimonial.name === "Sara L." || testimonial.name === "Jack" || testimonial.name === "Raj.") && "Happy Client"}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
+  <div className="flex flex-wrap justify-center gap-6 max-w-7xl mx-auto">
+    {/* Testimonial Cards with animation */}
+    {testimonials.map((testimonial, index) => (
+      <div
+        key={index}
+        className={`bg-gray-700 rounded-lg shadow-md p-6 w-80 transition-all duration-300 transform hover:scale-105 hover:rotate-0 ${
+          index % 2 === 0 ? 'rotate-[-3deg]' : 'rotate-[2deg]'
+        }`}
+      >
+        <p className="text-gray-200 mb-6">"{testimonial.message}"</p>
+        <div className="flex items-center gap-3">
+          <img
+            src={`https://randomuser.me/api/portraits/${index % 2 === 0 ? 'men' : 'women'}/${30 + index}.jpg`}
+            alt={testimonial.name}
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <div className="text-left">
+            <p className="font-semibold text-sm text-white">{testimonial.name}</p>
+            <p className="text-xs text-gray-400">
+              {testimonial.name === "Rai M." && "Founder of ArtisanMarket"}
+              {testimonial.name === "Mike P." && "GreenFuture Foundation"}
+              {testimonial.name === "Sadiya" && "Employee NovaTech"}
+              {testimonial.name === "Sara L." && "Influencer"}
+              {testimonial.name === "Jack" && "Teacher"}
+              {testimonial.name === "Raj." && "Travel influencer"}
+              {!["Rai M.", "Mike P.", "Sadiya", "Sara L.", "Jack", "Raj."].includes(testimonial.name) &&
+                "Happy Client"}
+            </p>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
 
                 {/* Newsletter */}
-                <div className="flex flex-col md:flex-row justify-between items-center bg-[#edf4fa] p-10 rounded-2xl my-12 mx-auto max-w-[1400px] shadow-md">
+                <div className="flex flex-col md:flex-row justify-between items-center bg-gray-800 p-10 rounded-2xl my-12 mx-auto max-w-[1400px] shadow-md">
                     <div className="max-w-[600px] text-center md:text-left mb-8 md:mb-0">
-                        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">Become a Culture Tripper!</h1>
-                        <p className="text-lg text-[#222] mb-6">Sign up to our newsletter to get notified for new trips.</p>
+                        <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 leading-tight">Become a Culture Tripper!</h1>
+                        <p className="text-lg text-gray-300 mb-6">Sign up to our newsletter to get notified for new trips.</p>
                         <div className="flex flex-col sm:flex-row gap-3 mb-4">
                             <input
                                 type="email"
                                 placeholder="E-mail address"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="px-5 py-3 w-full sm:w-[360px] text-base rounded-full border border-gray-300 outline-none"
+                                className="px-5 py-3 w-full sm:w-[360px] text-base rounded-full border border-gray-600 bg-gray-700 text-white outline-none"
                             />
                             <button
-                                className="px-7 py-3 bg-black text-white text-base rounded-full border-none cursor-pointer hover:bg-gray-800 transition"
+                                className="px-7 py-3 bg-blue-600 text-white text-base rounded-full border-none cursor-pointer hover:bg-blue-700 transition"
                                 onClick={handleNewsletterSignup}
                             >
                                 Sign Up
                             </button>
                         </div>
-                        {emailError && <p className="text-red-600 font-medium mb-2">{emailError}</p>}
-                        {signedUp && <p className="text-green-600 font-medium mb-2">You've signed up for our newsletter!</p>}
-                        <p className="text-sm text-gray-600 mt-2">
-                            See our <a href="#" className="text-black underline">privacy policy</a>.
+                        {emailError && <p className="text-red-400 font-medium mb-2">{emailError}</p>}
+                        {signedUp && <p className="text-green-400 font-medium mb-2">You've signed up for our newsletter!</p>}
+                        <p className="text-sm text-gray-400 mt-2">
+                            See our <a href="#" className="text-blue-400 underline">privacy policy</a>.
                         </p>
-                        <p className="text-sm text-gray-600">
-                            This site is protected by reCAPTCHA and the Google <a href="#" className="text-black underline">Privacy Policy</a> and <a href="#" className="text-black underline">Terms of Service</a> apply.
+                        <p className="text-sm text-gray-400">
+                            This site is protected by reCAPTCHA and the Google <a href="#" className="text-blue-400 underline">Privacy Policy</a> and <a href="#" className="text-blue-400 underline">Terms of Service</a> apply.
                         </p>
                     </div>
                     <div>
@@ -704,7 +762,7 @@ export function Homepage() {
                     </div>
                 </div>
 
-                {/* Login/Signup Modal */}
+                {/* Login/Signup Modal (retained white background for contrast) */}
                 {showForm && (
                     !loggedIn ?
                         <div className="fixed top-0 left-0 h-screen w-screen bg-black bg-opacity-60 flex justify-center items-center z-[999]"
@@ -716,7 +774,7 @@ export function Homepage() {
                                 >
                                     &times;
                                 </button>
-                                <h2 className="text-lg font-bold mb-4">PROFILE</h2>
+                                <h2 className="text-lg font-bold mb-4 text-gray-800">PROFILE</h2>
                                 <hr className="mb-4" />
                                 <div className="flex bg-gray-200 rounded-full overflow-hidden mb-6 shadow-inner">
                                     <button
@@ -834,7 +892,7 @@ export function Homepage() {
                                 >
                                     &times;
                                 </button>
-                                <h2 className="text-lg font-bold mb-4">Welcome Back!</h2>
+                                <h2 className="text-lg font-bold mb-4 text-gray-800">Welcome Back!</h2>
                                 <hr className="mb-4" />
                                 <p className="text-gray-700 mb-4">You are currently logged in.</p>
                                 <button
@@ -843,6 +901,13 @@ export function Homepage() {
                                 >
                                     Log Out
                                 </button>
+                                {/* New button to go to dashboard from login modal */}
+                                <button
+                                    className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+                                    onClick={() => { setShowForm(false); handleDashboardClick(); }}
+                                >
+                                    Go to Dashboard
+                                </button>
                             </div>
                         </div>
                 )}
@@ -850,6 +915,3 @@ export function Homepage() {
         </div>
     );
 }
-
-// Exporting Homepage as the default component
-export default Homepage;
