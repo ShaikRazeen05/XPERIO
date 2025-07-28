@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Heart } from 'lucide-react'; // Assuming Heart is used for favorites
+import { Heart } from 'lucide-react';
 import { Star, MapPin, Clock,Send } from 'lucide-react';
 import ImageTrail from './ImageTrail.jsx'
 import {useNavigate} from 'react-router-dom';
+import { motion } from "framer-motion";
 
-// Basic implementation of StarBorder component to resolve import error
-// This component wraps its children and applies some styling,
-// mimicking the original usage with 'as' prop for flexibility.
 const StarBorder = ({ children, as: Component = 'div', color = 'gray', speed = '1s', ...props }) => {
     // Tailwind classes for styling based on props
     const baseClasses = "relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800";
@@ -165,7 +163,7 @@ export function Homepage() {
     };
 
     // Background image for the hero section - using a more visible placeholder
-    const heroBackgroundImage = 'https://placehold.co/1920x1080/4A4A4A/FFFFFF?text=YOUR+BACKGROUND+IMAGE';
+    const heroBackgroundImage = './pictures_homepage';
 
     return (
         // Outermost div now holds the background image and the main overlay
@@ -222,12 +220,6 @@ export function Homepage() {
                         <StarBorder as="button" color="sky" speed="2s" onClick={(e) => { e.stopPropagation(); setShowPremium(true); }}>
                             Premium
                         </StarBorder>
-                        <StarBorder as="button" color="cyan" speed="2s" onClick={(e) => { e.stopPropagation(); console.log(1);navigate('/food'); }}>
-                            Food
-                        </StarBorder>
-                        <StarBorder as="button" color="cyan" speed="2s" onClick={(e) => { e.stopPropagation(); setShowCulture(true); }}>
-                            Culture
-                        </StarBorder>
                         {/* New Dashboard link - visible only when logged in */}
                         {loggedIn && (
                             <StarBorder as="button" color="green" speed="2s" onClick={(e) => { e.stopPropagation(); handleDashboardClick(); }}>
@@ -261,7 +253,7 @@ export function Homepage() {
                     >
                        Xperio
                     </h1>
-                    <div className="absolute  h-screen w-screen ">
+                    <div className="absolute  h-screen w-screen z-0">
             <ImageTrail
               
               items={[
@@ -275,7 +267,7 @@ export function Homepage() {
                 'https://picsum.photos/id/1030/300/300',
                 // ...
               ]}
-              variant={4}
+              variant={6}
             />
           </div>
 
@@ -291,7 +283,7 @@ export function Homepage() {
                     </h1>
                     <button
                         onClick={handleExploreClick}
-                        className="mt-8 inline-block px-8 py-4 bg-black bg-opacity-60 text-white font-bold rounded-full hover:bg-black hover:bg-opacity-80 transition-all duration-300 shadow-lg animate-bounce-slow"
+                        className="mt-8 inline-block px-8 py-4 z-20 bg-black bg-opacity-60 text-white font-bold rounded-full hover:bg-black hover:bg-opacity-80 transition-all duration-300 shadow-lg animate-bounce-slow"
                     >
                         Explore Xperio
                     </button>
@@ -369,357 +361,171 @@ export function Homepage() {
 
                 {/* Featured Sections */}
                 <div id="xperio-categories" className="p-8 space-y-20">
-                    <section className="bg-gray-800 rounded-3xl shadow-2xl p-8 md:p-12 relative overflow-hidden transform transition-transform duration-500 hover:scale-[1.01]">
-                        <h2 className="text-4xl font-extrabold mb-4 text-white text-center">Xperio Food Delights</h2>
-                        <p className="text-lg text-gray-300 mb-10 text-center max-w-2xl mx-auto">
-                            Savor the authentic tastes of India's diverse street food scene.
-                        </p>
 
-                        {/* Horizontal Scrollable Cards */}
-                        <div
-                            className="flex gap-8 overflow-x-auto scroll-smooth cursor-grab active:cursor-grabbing py-4 px-2 -mx-2 custom-scrollbar"
-                            onMouseDown={(e) => {
-                                const container = e.currentTarget;
-                                let startX = e.pageX - container.offsetLeft;
-                                let scrollLeft = container.scrollLeft;
-
-                                const onMouseMove = (ev) => {
-                                    const x = ev.pageX - container.offsetLeft;
-                                    const walk = (x - startX) * 1.5;
-                                    container.scrollLeft = scrollLeft - walk;
-                                };
-                                const onMouseUp = () => {
-                                    container.removeEventListener("mousemove", onMouseMove);
-                                    container.removeEventListener("mouseup", onMouseUp);
-                                };
-                                container.addEventListener("mousemove", onMouseMove);
-                                container.addEventListener("mouseup", onMouseUp);
-                            }}
+                    {/* Content */}
+                    <div className="relative z-10 max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between md:gap-x-16 space-y-10 md:space-y-0">
+                        {/* Text Section */}
+                        <motion.div
+                        initial={{ opacity: 0, x: -50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 1 }}
+                        viewport={{ once: true }}
+                        className="md:w-1/2 text-white"
                         >
-                            {/* Food Card 1 */}
-                            <div className="bg-gray-700 rounded-[2.5rem] p-6 w-[280px] flex-shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-                        <div className="h-44 overflow-hidden rounded-2xl mb-4">
-                            <img
-                            src="pictures_homepage/biryani.jpg"
-                            alt="Hyderabadi Biryani"
-                            className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
-                            />
-                        </div>
-                        <div className="text-center">
-                            <h3 className="text-xl font-bold text-white flex items-center justify-center gap-2 mb-1">
-                            Hyderabadi Biryani
-                            <Heart
-                                className={`h-6 w-6 cursor-pointer ${fav['Hyderabadi Biryani'] ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-500'}`}
-                                onClick={() => handleFav('Hyderabadi Biryani')}
-                            />
-                            </h3>
-                            <p className="text-gray-300 text-sm mb-2">Hyderabad, Telangana</p>
-
-                            <div className="flex items-center justify-between space-x-6 text-white text-sm mb-4">
-                            {/* Rating */}
-                            <div className="flex items-center space-x-1">
-                                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                <span>4.9</span>
-                            </div>
-
-                            {/* Distance */}
-                            <div className="flex items-center space-x-1">
-                                <MapPin className="w-4 h-4 text-white" />
-                                <span>0.8 km</span>
-                            </div>
-                            </div>
-
-                            {/* Buttons */}
-                            <div className="flex justify-center gap-4 mt-2">
-                            <button className="bg-indigo-500 hover:bg-indigo-600 text-white text-sm px-4 py-2 rounded-full transition-colors duration-300">
-                                Explore
-                            </button>
-                            <button className="bg-emerald-500 hover:bg-emerald-600 text-white text-sm px-4 py-2 rounded-full transition-colors duration-300">
-                                Add to Plan
-                            </button>
-                            </div>
-                        </div>
-                        </div>
-
-                            {/* Food Card 2 */}
-                            <div className="bg-gray-700 rounded-[2.5rem] p-6 w-[280px] flex-shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-                                <div className="h-44 overflow-hidden rounded-2xl mb-4">
-                                    <img src="pictures_homepage/vadapav.jpg" alt="Vada Pav" className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300" />
-                                </div>
-                                <div className="text-center">
-                                    <h3 className="text-xl font-bold text-white flex items-center justify-center gap-2 mb-1">
-                                        Mumbai Vada Pav
-                                        <Heart
-                                            className={`h-6 w-6 cursor-pointer ${fav['Vada Pav'] ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-500'}`}
-                                            onClick={() => handleFav('Vada Pav')}
-                                        />
-                                    </h3>
-                                    <p className="text-gray-300 text-sm mb-2">Mumbai, Maharashtra</p>
-                                    <div className="flex items-center justify-between space-x-6 text-white text-sm">
-                                    {/* Rating */}
-                                    <div className="flex items-center space-x-1">
-                                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                        <span>4.9</span>
-                                    </div>
-
-                                    {/* Distance */}
-                                    <div className="flex items-center space-x-1">
-                                        <MapPin className="w-4 h-4 text-white" />
-                                        <span>0.8 km</span>
-                                    </div>
-
-                                    {/* Status */}
-                                    <div className="flex items-center space-x-1">
-                                        <Clock className="w-4 h-4 text-white" />
-                                        <span>Open</span>
-                                    </div>
-                                    </div>
-<div className="flex justify-center gap-4 mt-2">
-                            <button className="bg-indigo-500 hover:bg-indigo-600 text-white text-sm px-4 py-2 rounded-full transition-colors duration-300">
-                                Explore
-                            </button>
-                            <button className="bg-emerald-500 hover:bg-emerald-600 text-white text-sm px-4 py-2 rounded-full transition-colors duration-300">
-                                Add to Plan
-                            </button>
-                            </div>
-                                </div>
-                            </div>
-
-                            {/* Food Card 3 */}
-                            <div className="bg-gray-700 rounded-[2.5rem] p-6 w-[280px] flex-shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-                                <div className="h-44 overflow-hidden rounded-2xl mb-4">
-                                    <img src="pictures_homepage/chat.jpg" alt="Delhi Chaat" className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300" />
-                                </div>
-                                <div className="text-center">
-                                    <h3 className="text-xl font-bold text-white flex items-center justify-center gap-2 mb-1">
-                                        Delhi Street Chaat
-                                        <Heart
-                                            className={`h-6 w-6 cursor-pointer ${fav['Delhi Chaat'] ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-500'}`}
-                                            onClick={() => handleFav('Delhi Chaat')}
-                                        />
-                                    </h3>
-                                    <p className="text-gray-300 text-sm mb-2">Delhi, NCR</p>
-                                    <div className="flex items-center justify-between space-x-6 text-white text-sm">
-                                    {/* Rating */}
-                                    <div className="flex items-center space-x-1">
-                                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                        <span>4.9</span>
-                                    </div>
-
-                                    {/* Distance */}
-                                    <div className="flex items-center space-x-1">
-                                        <MapPin className="w-4 h-4 text-white" />
-                                        <span>0.8 km</span>
-                                    </div>
-
-                                    {/* Status */}
-                                    <div className="flex items-center space-x-1">
-                                        <Clock className="w-4 h-4 text-white" />
-                                        <span>Open</span>
-                                    </div>
-                                    </div>
-                                <div className="flex justify-center gap-4 mt-2">
-                            <button className="bg-indigo-500 hover:bg-indigo-600 text-white text-sm px-4 py-2 rounded-full transition-colors duration-300">
-                                Explore
-                            </button>
-                            <button className="bg-emerald-500 hover:bg-emerald-600 text-white text-sm px-4 py-2 rounded-full transition-colors duration-300">
-                                Add to Plan
-                            </button>
-                            </div>
-                                </div>
-                            </div>
-
-                            {/* Food Card 4 */}
-                            <div className="bg-gray-700 rounded-[2.5rem] p-6 w-[280px] flex-shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-                                <div className="h-44 overflow-hidden rounded-2xl mb-4">
-                                    <img src="pictures_homepage/dosa.jpg" alt="Masala Dosa" className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300" />
-                                </div>
-                                <div className="text-center">
-                                    <h3 className="text-xl font-bold text-white flex items-center justify-center gap-2 mb-1">
-                                        Masala Dosa
-                                        <Heart
-                                            className={`h-6 w-6 cursor-pointer ${fav['Masala Dosa'] ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-500'}`}
-                                            onClick={() => handleFav('Masala Dosa')}
-                                        />
-                                    </h3>
-                                    <p className="text-gray-300 text-sm mb-2">Bengaluru, Karnataka</p>
-                                    <div className="flex items-center justify-between space-x-6 text-white text-sm">
-                                    {/* Rating */}
-                                    <div className="flex items-center space-x-1">
-                                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                        <span>4.9</span>
-                                    </div>
-
-                                    {/* Distance */}
-                                    <div className="flex items-center space-x-1">
-                                        <MapPin className="w-4 h-4 text-white" />
-                                        <span>0.8 km</span>
-                                    </div>
-
-                                    {/* Status */}
-                                    <div className="flex items-center space-x-1">
-                                        <Clock className="w-4 h-4 text-white" />
-                                        <span>Open</span>
-                                    </div>
-                                    </div>
-<div className="flex justify-center gap-4 mt-2">
-                            <button className="bg-indigo-500 hover:bg-indigo-600 text-white text-sm px-4 py-2 rounded-full transition-colors duration-300">
-                                Explore
-                            </button>
-                            <button className="bg-emerald-500 hover:bg-emerald-600 text-white text-sm px-4 py-2 rounded-full transition-colors duration-300">
-                                Add to Plan
-                            </button>
-                            </div>
-                                </div>
-                            </div>
-
-                            {/* Food Card 5 */}
-                            <div className="bg-gray-700 rounded-[2.5rem] p-6 w-[280px] flex-shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-                                <div className="h-44 overflow-hidden rounded-2xl mb-4">
-                                    <img src="pictures_homepage/rogan.png" alt="Rogan Josh" className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300" />
-                                </div>
-                                <div className="text-center">
-                                    <h3 className="text-xl font-bold text-white flex items-center justify-center gap-2 mb-1">
-                                        Kashmiri Rogan Josh
-                                        <Heart
-                                            className={`h-6 w-6 cursor-pointer ${fav['Rogan Josh'] ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-500'}`}
-                                            onClick={() => handleFav('Rogan Josh')}
-                                        />
-                                    </h3>
-                                    <p className="text-gray-300 text-sm mb-2">Kashmir, J&K</p>
-                                    <div className="flex items-center justify-between space-x-6 text-white text-sm">
-                                    {/* Rating */}
-                                    <div className="flex items-center space-x-1">
-                                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                        <span>4.9</span>
-                                    </div>
-
-                                    {/* Distance */}
-                                    <div className="flex items-center space-x-1">
-                                        <MapPin className="w-4 h-4 text-white" />
-                                        <span>0.8 km</span>
-                                    </div>
-
-                                    {/* Status */}
-                                    <div className="flex items-center space-x-1">
-                                        <Clock className="w-4 h-4 text-white" />
-                                        <span>Open</span>
-                                    </div>
-                                    
-                                    </div>
-<div className="flex justify-center gap-4 mt-2">
-                            <button className="bg-indigo-500 hover:bg-indigo-600 text-white text-sm px-4 py-2 rounded-full transition-colors duration-300">
-                                Explore
-                            </button>
-                            <button className="bg-emerald-500 hover:bg-emerald-600 text-white text-sm px-4 py-2 rounded-full transition-colors duration-300">
-                                Add to Plan
-                            </button>
-                            </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section className="bg-gray-800 rounded-3xl shadow-2xl p-8 md:p-12 transform transition-transform duration-500 hover:scale-[1.01]">
-                        <h2 className="text-4xl font-extrabold mb-4 text-white text-center">
-                            Xperio Cultural Immersion
+                        <h2 className="text-4xl md:text-5xl font-extrabold mb-6">
+                            🍴 XperioFood
                         </h2>
-                        <p className="text-lg text-gray-300 mb-10 text-center max-w-2xl mx-auto">
-                            Dive deep into the vibrant traditions and captivating performances of India.
+                        <p className="text-lg md:text-xl mb-6">
+                            Discover the authentic taste of Indian street food — from spicy chaats to mouth-watering dosas, all in one place. Explore culinary culture with XperioFood.
                         </p>
-
-                        {/* Horizontal Scrollable Cards - Now styled like Food Delights */}
-                        <div
-                            className="flex gap-8 overflow-x-auto scroll-smooth cursor-grab active:cursor-grabbing py-4 px-2 -mx-2 custom-scrollbar"
-                            onMouseDown={(e) => {
-                                const container = e.currentTarget;
-                                let startX = e.pageX - container.offsetLeft;
-                                let scrollLeft = container.scrollLeft;
-
-                                const onMouseMove = (ev) => {
-                                    const x = ev.pageX - container.offsetLeft;
-                                    const walk = (x - startX) * 1.5;
-                                    container.scrollLeft = scrollLeft - walk;
-                                };
-                                const onMouseUp = () => {
-                                    container.removeEventListener("mousemove", onMouseMove);
-                                    container.removeEventListener("mouseup", onMouseUp);
-                                };
-                                container.addEventListener("mousemove", onMouseMove);
-                                container.addEventListener("mouseup", onMouseUp);
-                            }}
+                        <motion.button
+                            onClick={() => navigate("/Food")}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="bg-orange-500 hover:bg-orange-600 text-white text-lg font-bold py-3 px-6 rounded-full shadow-md transition duration-300"
                         >
-                            {/* CULTURE CARD TEMPLATE */}
-                            {[
-                                {
-                                    title: "Kathakali Dance",
-                                    location: "Kerala",
-                                    description: "Traditional Classical Art",
-                                    image: "pictures_homepage/kathhak.jpg",
-                                },
-                                {
-                                    title: "Rajasthani Puppetry",
-                                    location: "Rajasthan",
-                                    description: "Folk Performing Art",
-                                    image: "pictures_homepage/puppets.jpeg",
-                                },
-                                {
-                                    title: "Durga Puja",
-                                    location: "West Bengal",
-                                    description: "Festival & Ritual",
-                                    image: "pictures_homepage/puja.jpg",
-                                },
-                                {
-                                    title: "Bhangra Dance",
-                                    location: "Punjab",
-                                    description: "Folk Dance",
-                                    image: "pictures_homepage/bhangra.jpg",
-                                },
-                                {
-                                    title: "Pongal / Sankranti",
-                                    location: "Tamil Nadu / Telangana",
-                                    description: "Harvest Festival",
-                                    image: "pictures_homepage/pongal.jpg",
-                                },
-                                {
-                                    title: "Garba Dance",
-                                    location: "Gujarat",
-                                    description: "Folk Festival Dance",
-                                    image: "pictures_homepage/garba.jpeg",
-                                },
-                            ].map((item) => (
-                                <div
-                                    key={item.title}
-                                    className="bg-gray-700 p-6 rounded-[2.5rem] w-[280px] flex-shrink-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
-                                >
-                                    <div className="h-44 overflow-hidden rounded-2xl mb-4">
-                                        <img
-                                            src={item.image}
-                                            alt={item.title}
-                                            className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
-                                        />
-                                    </div>
-                                    <div className="text-center">
-                                        <h3 className="text-xl font-bold text-white flex items-center justify-center gap-2 mb-1">
-                                            {item.title}
-                                            <Heart
-                                                className={`h-6 w-6 cursor-pointer ${
-                                                    fav[item.title]
-                                                        ? "fill-red-500 text-red-500"
-                                                        : "text-gray-400 hover:text-red-500"
-                                                }`}
-                                                onClick={() => handleFav(item.title)}
-                                            />
-                                        </h3>
-                                        <p className="text-gray-300 text-sm mb-2">{item.location}</p>
-                                        <p className="mt-3 font-bold text-indigo-400 text-md">
-                                            {item.description}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
+                            Explore Food
+                        </motion.button>
+                        </motion.div>
+
+                        {/* Image Section */}
+                        <motion.div
+                        initial={{ opacity: 0, x: 50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 1 }}
+                        viewport={{ once: true }}
+                        className="md:w-1/2"
+                        >
+                        <img
+                            src={'./pictures_homepage/food_banner.png'}
+                            alt="Street Food"
+                            className="w-full rounded-lg shadow-lg"
+                        />
+                        </motion.div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="relative z-10 max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between md:gap-x-16 space-y-10 md:space-y-0">
+                        {/* Text Section */}
+                        <motion.div
+                        initial={{ opacity: 0, x: -50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 1 }}
+                        viewport={{ once: true }}
+                        className="md:w-1/2 text-white"
+                        >
+                        <h2 className="text-4xl md:text-5xl font-extrabold mb-6">
+                            🎭 XperioCulture
+                        </h2>
+                        <p className="text-lg md:text-xl mb-6">
+                            Dive into the rich tapestry of Indian culture. Explore traditional dances, vibrant festivals, ancient crafts, and timeless heritage — all in one platform.
+                        </p>
+                        <motion.button
+                            onClick={() => navigate("/Culture")}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="bg-purple-600 hover:bg-purple-700 text-white text-lg font-bold py-3 px-6 rounded-full shadow-md transition duration-300"
+                        >
+                            Explore Culture
+                        </motion.button>
+                        </motion.div>
+
+                        {/* Image Section */}
+                        <motion.div
+                        initial={{ opacity: 0, x: 50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 1 }}
+                        viewport={{ once: true }}
+                        className="md:w-1/2"
+                        >
+                        <img
+                            src={'./pictures_homepage/culture_banner.png'}
+                            alt="Cultural Heritage"
+                            className="w-full rounded-lg shadow-lg"
+                        />
+                        </motion.div>
+                    </div>
+                    <div className="relative z-10 max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between md:gap-x-16 space-y-10 md:space-y-0">
+                        {/* Text Section */}
+                        <motion.div
+                        initial={{ opacity: 0, x: -50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 1 }}
+                        viewport={{ once: true }}
+                        className="md:w-1/2 text-white"
+                        >
+                        <h2 className="text-4xl md:text-5xl font-extrabold mb-6">
+                           Xperio Translator
+                        </h2>
+                        <p className="text-lg md:text-xl mb-6">
+                            Dive into the rich tapestry of Indian culture. Explore traditional dances, vibrant festivals, ancient crafts, and timeless heritage — all in one platform.
+                        </p>
+                        <motion.button
+                            onClick={() => navigate("/Translator")}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="bg-purple-600 hover:bg-purple-700 text-white text-lg font-bold py-3 px-6 rounded-full shadow-md transition duration-300"
+                        >
+                            Explore Translation
+                        </motion.button>
+                        </motion.div>
+
+                        {/* Image Section */}
+                        <motion.div
+                        initial={{ opacity: 0, x: 50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 1 }}
+                        viewport={{ once: true }}
+                        className="md:w-1/2"
+                        >
+                        <img
+                            src={'./pictures_homepage/translation_banner.png'}
+                            alt="Cultural Heritage"
+                            className="w-full rounded-lg shadow-lg"
+                        />
+                        </motion.div>
+                    </div>
+                    
+                     <div className="relative z-10 max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between md:gap-x-16 space-y-10 md:space-y-0">
+                        {/* Text Section */}
+                        <motion.div
+                        initial={{ opacity: 0, x: -50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 1 }}
+                        viewport={{ once: true }}
+                        className="md:w-1/2 text-white"
+                        >
+                        <h2 className="text-4xl md:text-5xl font-extrabold mb-6">
+                           Xperio Translator
+                        </h2>
+                        <p className="text-lg md:text-xl mb-6">
+                             Unlock exclusive features, priority support, and early access to new modules. Go premium and experience the full power of Xperio without limits.
+                        </p>
+                        <motion.button
+                            onClick={() => navigate("/ Premium")}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="bg-purple-600 hover:bg-purple-700 text-white text-lg font-bold py-3 px-6 rounded-full shadow-md transition duration-300"
+                        >
+                            Preimum
+                        </motion.button>
+                        </motion.div>
+
+                        {/* Image Section */}
+                        <motion.div
+                        initial={{ opacity: 0, x: 50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 1 }}
+                        viewport={{ once: true }}
+                        className="md:w-1/2"
+                        >
+                        <img
+                            src={'./pictures_homepage/premium.png'}
+                            alt="Cultural Heritage"
+                            className="w-full rounded-lg shadow-lg"
+                        />
+                        </motion.div>
+                    </div>
                 </div>
 
                 {/* Translator Section */}
@@ -839,11 +645,11 @@ export function Homepage() {
                     </div>
                 )}
 
-          <section className="bg-gray-800 py-16 px-4 text-center">
+          <section className="bg-gray-900 py-16 px-4 text-center">
   <h2 className="text-3xl font-bold mb-2 text-white">Social proof? Here.</h2>
-  <p className="text-gray-300 mb-10">
-    From exploring local gems to global adventures, 2000+ happy clients and still counting.
-  </p>
+  <p className="mb-10" style={{ color: '#FFD700' }}>
+  From exploring local gems to global adventures, 2000+ happy clients and still counting.
+</p>
 
   <div className="flex flex-wrap justify-center gap-6 max-w-7xl mx-auto">
     {/* Testimonial Cards with animation */}
@@ -881,7 +687,7 @@ export function Homepage() {
 </section>
 
                 {/* Newsletter */}
-                <div className="flex flex-col md:flex-row justify-between items-center bg-gray-800 p-10 rounded-2xl my-12 mx-auto max-w-[1400px] shadow-md">
+                <div className="flex flex-col md:flex-row justify-between items-center bg-gray-900 p-10 rounded-2xl my-12 mx-auto max-w-[1400px] shadow-md">
                     <div className="max-w-[600px] text-center md:text-left mb-8 md:mb-0">
                         <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 leading-tight">Become a Culture Tripper!</h1>
                         <p className="text-lg text-gray-300 mb-6">Sign up to our newsletter to get notified for new trips.</p>
