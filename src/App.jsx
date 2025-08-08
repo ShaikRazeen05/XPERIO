@@ -1,18 +1,31 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import './style.css'
-import {Homepage} from './components/Homepage.jsx';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState } from 'react';
+import './App.css';
+import './style.css';
+import { Homepage } from './components/Homepage.jsx';
+import  Premium  from './components/Premium.jsx';
+import { Food } from './components/Food.jsx';
+import { Culture } from './components/Culture.jsx';
+import   Translator from './components/Translator.jsx';
+import   Loginpage from './components/Loginpage.jsx';
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
+
   return (
-    <>
-      <div className="flex-1 h-full w-full"> 
-        <Homepage/>
+    <Router>
+      <div className="h-screen w-screen">
+        <Routes>
+          <Route path="/" element={<Homepage />} />
+          <Route path="/Premium" element={<Premium />} />
+          <Route path="/Food" element={<Food />} />
+          <Route path="/Culture" element={< Culture />} />
+          <Route path="/Translator" element={<Translator />} />
+          <Route path="/Loginpage" element={<Loginpage />} />
+        </Routes>
       </div>
-    </>
-  )
+    </Router>
+  );
 }
 
-export default App
+export default App;
+
