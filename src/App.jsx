@@ -5,8 +5,8 @@ import './style.css';
 import ScrollToTop from './components/ScrollToTop'; // Add this import
 import { Homepage } from './components/Homepage.jsx';
 import Premium from './components/Premium.jsx';
-import { Food } from './components/Food.jsx';
-import { Culture } from './components/Culture.jsx';
+import  Food  from './components/Food.jsx';
+import Culture from './components/Culture.jsx';
 import Translator from './components/Translator.jsx';
 import Loginpage from './components/Loginpage.jsx';
 

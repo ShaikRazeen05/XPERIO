@@ -1,520 +1,553 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaCopy } from 'react-icons/fa';
-import { BookMarked, Volume2, Languages, ArrowRight, ArrowLeftRight, Globe, Sparkles, Zap } from 'lucide-react';
-import { COLORS, ANIMATION } from './constants';
+import { 
+  Search, Filter, MapPin, Clock, Star, Heart, ArrowRight, Languages, 
+  Camera, Share2, Globe, Eye, Phone, Calendar, Users, Award, Volume2,
+  Bot, X, SendHorizontal, MessageCircle, Sparkles, Mic, MicOff, Copy,
+  ArrowRightLeft, Headphones, BookOpen, Download, Upload
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from './Navbar';
+import ProfessionalNavbar from './ProfessionalNavbar';
+import AdvancedChatbot from './AdvancedChatbot';
 import Footer from './Footer';
+import './translator.css';
 
-// ---[ Subcomponents ]---
-// TranslationInput, TranslationList, PhrasebookCard, TipsSection, Footer
+export function Translator() {
+    const navigate = useNavigate();
+    const [selectedFromLang, setSelectedFromLang] = useState('en');
+    const [selectedToLang, setSelectedToLang] = useState('es');
+    const [translationMode, setTranslationMode] = useState('text');
+    const [inputText, setInputText] = useState('');
+    const [translatedText, setTranslatedText] = useState('');
+    const [isRecording, setIsRecording] = useState(false);
+    const [favorites, setFavorites] = useState(new Set());
+    const [chatbotOpen, setChatbotOpen] = useState(false);
+    const [recentTranslations, setRecentTranslations] = useState([]);
 
-export default function Translator() {
-  const [activeTab, setActiveTab] = useState('live');
-  const [fromLang, setFromLang] = useState('English');
-  const [toLang, setToLang] = useState('Spanish');
-  const [text, setText] = useState('');
-  const [translations, setTranslations] = useState([]);
-  const [showCopyMessage, setShowCopyMessage] = useState(false);
-
-  const availableLanguages = ['English', 'Spanish', 'German', 'French', 'Japanese', 'Italian'];
-
-  const handleTranslate = () => {
-    if (!text.trim()) return;
-    const newTranslation = {
-      from: fromLang,
-      to: toLang,
-      original: text,
-      // In a real app, you'd call an API here to get the actual translation
-      result: `[${toLang}] ${text.split(' ').reverse().join(' ')}` // Simple mock translation
+    const handleNavigation = (url) => {
+        navigate(url);
     };
-    setTranslations([newTranslation, ...translations]);
-    setText('');
-  };
 
-  const speakText = (textToSpeak, langCode) => {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(textToSpeak);
-      const langMap = {
-        'English': 'en-US',
-        'Spanish': 'es-ES',
-        'French': 'fr-FR',
-        'German': 'de-DE',
-        'Japanese': 'ja-JP',
-        'Italian': 'it-IT',
-      };
-      utterance.lang = langMap[langCode] || 'en-US';
-      window.speechSynthesis.speak(utterance);
-    } else {
-      alert("Text-to-speech not supported in this browser.");
-    }
-  };
+    // Popular languages with flags[1][2][5]
+    const popularLanguages = [
+        { code: 'en', name: 'English', flag: '🇺🇸' },
+        { code: 'es', name: 'Spanish', flag: '🇪🇸' },
+        { code: 'fr', name: 'French', flag: '🇫🇷' },
+        { code: 'de', name: 'German', flag: '🇩🇪' },
+        { code: 'it', name: 'Italian', flag: '🇮🇹' },
+        { code: 'pt', name: 'Portuguese', flag: '🇵🇹' },
+        { code: 'ru', name: 'Russian', flag: '🇷🇺' },
+        { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
+        { code: 'ko', name: 'Korean', flag: '🇰🇷' },
+        { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
+        { code: 'ar', name: 'Arabic', flag: '🇸🇦' },
+        { code: 'hi', name: 'Hindi', flag: '🇮🇳' }
+    ];
 
-  const copyText = (textToCopy) => {
-    navigator.clipboard.writeText(textToCopy)
-      .then(() => {
-        setShowCopyMessage(true);
-        setTimeout(() => setShowCopyMessage(false), 2000);
-      })
-      .catch(err => console.error("Could not copy text: ", err));
-  };
+    // Translation modes[1][5][8]
+    const translationModes = [
+        { id: 'text', label: 'Text Translation', icon: <Languages className="mode-icon" />, description: 'Type or paste text to translate' },
+        { id: 'voice', label: 'Voice Translation', icon: <Mic className="mode-icon" />, description: 'Speak and get instant translation' },
+        { id: 'camera', label: 'Camera Translation', icon: <Camera className="mode-icon" />, description: 'Translate text from images' },
+        { id: 'conversation', label: 'Conversation Mode', icon: <Users className="mode-icon" />, description: 'Real-time bilingual chat' }
+    ];
 
-  const swapLanguages = () => {
-    setFromLang(toLang);
-    setToLang(fromLang);
-  };
+    // Premium features showcase[1][5][6]
+    const translatorFeatures = [
+        {
+            id: 1,
+            name: "Real-Time Voice Translation",
+            description: "Speak naturally and get instant translation with voice recognition powered by advanced AI. Perfect for conversations and meetings.",
+            image: "https://images.unsplash.com/photo-1516321165247-4aa89a48be28?auto=format&fit=crop&w=800&q=80",
+            icon: <Mic className="feature-icon" />,
+            benefits: ['Voice recognition', 'Natural speech', 'Real-time results']
+        },
+        {
+            id: 2,
+            name: "Camera Translation",
+            description: "Point your camera at any text - signs, menus, documents - and get instant translations overlaid on your screen in augmented reality.",
+            image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
+            icon: <Camera className="feature-icon" />,
+            benefits: ['AR overlay', 'Text recognition', 'Instant translation']
+        },
+        {
+            id: 3,
+            name: "Document Translation",
+            description: "Upload and translate entire documents while preserving formatting. Support for PDF, Word, PowerPoint, and more file types.",
+            image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80",
+            icon: <Upload className="feature-icon" />,
+            benefits: ['Format preserved', 'Multiple file types', 'Bulk processing']
+        },
+        {
+            id: 4,
+            name: "Offline Translation",
+            description: "Download language packs and translate without internet connection. Perfect for travel and areas with poor connectivity.",
+            image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80",
+            icon: <Download className="feature-icon" />,
+            benefits: ['No internet needed', 'Travel ready', 'Fast processing']
+        }
+    ];
 
-  const phrasebookData = [
-    {
-      category: 'Greetings',
-      language: 'French',
-      phrase: 'Bonjour',
-      translation: 'Hello',
-      example: "When meeting someone new, you can say 'Bonjour' to greet them.",
-      icon: <Sparkles className="w-5 h-5" />
-    },
-    {
-      category: 'Dining',
-      language: 'Spanish',
-      phrase: 'La cuenta, por favor.',
-      translation: 'The bill, please.',
-      example: "After finishing your meal, ask the waiter 'La cuenta, por favor.'",
-      icon: <Zap className="w-5 h-5" />
-    },
-    {
-      category: 'Directions',
-      language: 'Italian',
-      phrase: "Dov'è il bagno?",
-      translation: 'Where is the bathroom?',
-      example: "If you are lost, ask a local 'Dov'è il bagno?'",
-      icon: <Globe className="w-5 h-5" />
-    },
-    {
-      category: 'Shopping',
-      language: 'German',
-      phrase: 'Wie viel kostet das?',
-      translation: 'How much does this cost?',
-      example: "When buying a souvenir, you might ask 'Wie much kostet das?'",
-      icon: <Sparkles className="w-5 h-5" />
-    },
-    {
-      category: 'Essentials',
-      language: 'Japanese',
-      phrase: 'すみません',
-      translation: 'Excuse me',
-      example: "If you need help, say 'すみません' to get someone's attention.",
-      icon: <Zap className="w-5 h-5" />
-    },
-    {
-      category: 'Emergency',
-      language: 'English',
-      phrase: 'Help!',
-      translation: 'Help!',
-      example: "Shout 'Help!' in case of an emergency.",
-      icon: <Globe className="w-5 h-5" />
-    }
-  ];
+    // Recent translations example data
+    const sampleTranslations = [
+        { from: 'Hello, how are you?', to: 'Hola, ¿cómo estás?', fromLang: 'en', toLang: 'es' },
+        { from: 'Where is the restaurant?', to: 'Où est le restaurant?', fromLang: 'en', toLang: 'fr' },
+        { from: 'Thank you very much', to: 'Vielen Dank', fromLang: 'en', toLang: 'de' }
+    ];
 
-  return (
-    <>
-      <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 text-gray-800 font-sans">
-        {/* Banner Image Section */}
-        <motion.div
-          className="relative w-full h-48 sm:h-64 md:h-80 flex items-center justify-center overflow-hidden"
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
+    const handleTranslate = () => {
+        // Simple demo translation
+        if (inputText.trim()) {
+            const newTranslation = {
+                from: inputText,
+                to: `[Translated] ${inputText}`,
+                fromLang: selectedFromLang,
+                toLang: selectedToLang
+            };
+            setTranslatedText(newTranslation.to);
+            setRecentTranslations(prev => [newTranslation, ...prev.slice(0, 4)]);
+        }
+    };
+
+    const swapLanguages = () => {
+        setSelectedFromLang(selectedToLang);
+        setSelectedToLang(selectedFromLang);
+        setInputText(translatedText);
+        setTranslatedText(inputText);
+    };
+
+    const copyToClipboard = (text) => {
+        navigator.clipboard.writeText(text);
+    };
+
+    // Animation variants
+    const staggerContainer = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const staggerItem = {
+        hidden: { opacity: 0, y: 50 },
+        show: { 
+            opacity: 1, 
+            y: 0,
+            transition: {
+                duration: 0.6,
+                ease: "easeOut"
+            }
+        }
+    };
+
+    // Enhanced Chatbot Component
+    const ChatbotWidget = () => (
+        <motion.div 
+            className="chatbot-widget"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3 }}
         >
-          <img
-            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80"
-            alt="Translator Banner"
-            className="absolute inset-0 w-full h-full object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-blue-900/40 to-purple-900/20 backdrop-blur-sm"></div>
-          <div className="relative z-10 text-center px-4">
-            <motion.div
-              className="flex items-center justify-center gap-3 mb-4"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
+            <AnimatePresence>
+                {chatbotOpen && (
+                    <motion.div
+                        className="chatbot-window"
+                        initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 50, scale: 0.9 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <div className="chatbot-header">
+                            <div className="chatbot-info">
+                                <div className="bot-avatar">
+                                    <Bot className="bot-icon" />
+                                    <div className="status-indicator"></div>
+                                </div>
+                                <div>
+                                    <h4>Translation AI</h4>
+                                    <p>Your multilingual assistant</p>
+                                </div>
+                            </div>
+                            <button 
+                                className="close-chatbot"
+                                onClick={() => setChatbotOpen(false)}
+                            >
+                                <X className="close-icon" />
+                            </button>
+                        </div>
+
+                        <div className="chatbot-messages">
+                            <motion.div 
+                                className="message bot-message"
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.2 }}
+                            >
+                                <div className="message-avatar">
+                                    <Languages className="avatar-icon" />
+                                </div>
+                                <div className="message-content">
+                                    <p>I can help you with translations in 100+ languages! What would you like to translate today?</p>
+                                    <div className="quick-actions">
+                                        <button className="quick-btn" onClick={() => setTranslationMode('text')}>
+                                            💬 Text Translation
+                                        </button>
+                                        <button className="quick-btn" onClick={() => setTranslationMode('voice')}>
+                                            🎤 Voice Translation
+                                        </button>
+                                        <button className="quick-btn" onClick={() => setTranslationMode('camera')}>
+                                            📷 Camera Translate
+                                        </button>
+                                        <button className="quick-btn" onClick={() => setTranslationMode('conversation')}>
+                                            👥 Conversation
+                                        </button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </div>
+
+                        <div className="chatbot-input">
+                            <input 
+                                type="text" 
+                                placeholder="Ask about translation features..."
+                                className="chat-input-field"
+                            />
+                            <button className="send-btn">
+                                <SendHorizontal className="send-icon" />
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <motion.button
+                className="chatbot-trigger"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setChatbotOpen(!chatbotOpen)}
+                animate={{ 
+                    y: [0, -10, 0],
+                    transition: { duration: 2, repeat: Infinity }
+                }}
             >
-              <Globe className="w-12 h-12 text-blue-400" />
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-display font-bold text-white drop-shadow-lg">
-                Break Language Barriers
-              </h1>
-              <Sparkles className="w-12 h-12 text-purple-400" />
-            </motion.div>
-            <motion.p 
-              className="text-xl sm:text-2xl text-white/90 max-w-3xl mx-auto drop-shadow font-body leading-relaxed"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.6 }}
-            >
-              Instantly translate and communicate with confidence, wherever you are in the world.
-            </motion.p>
-          </div>
+                <Languages className="chatbot-icon" />
+                <motion.div 
+                    className="notification-badge"
+                    animate={{ 
+                        scale: [1, 1.2, 1],
+                        transition: { duration: 2, repeat: Infinity }
+                    }}
+                >
+                    AI
+                </motion.div>
+                <div className="pulse-ring"></div>
+            </motion.button>
         </motion.div>
+    );
 
-        {/* Main Translator Section */}
-        <div id="translator-main-section" className="p-4 md:p-10 lg:p-12">
-          <motion.div
-            className="text-center mb-12"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
-          >
-            <h1 className="text-5xl md:text-6xl font-display font-bold mb-6">
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                Xperio
-              </span>
-              <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-                Translator
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto font-body leading-relaxed">
-              Break down language barriers with instant translation and essential travel phrases.
-              Communicate confidently wherever your journey takes you.
-            </p>
-          </motion.div>
-
-          {/* Tab Buttons */}
-          <motion.div
-            className="flex justify-center mb-12 gap-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.5 }}
-          >
-            <motion.button
-              className={`px-8 py-4 rounded-2xl font-bold text-lg flex items-center gap-3 transition-all duration-300 ${
-                activeTab === 'live' 
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-xl scale-105' 
-                  : 'bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white hover:shadow-lg border border-gray-200'
-              }`}
-              onClick={() => setActiveTab('live')}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Languages size={20} /> Live Translator
-            </motion.button>
-            <motion.button
-              className={`px-8 py-4 rounded-2xl font-bold text-lg flex items-center gap-3 transition-all duration-300 ${
-                activeTab === 'phrasebook' 
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105' 
-                  : 'bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white hover:shadow-lg border border-gray-200'
-              }`}
-              onClick={() => setActiveTab('phrasebook')}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <BookMarked size={20} /> Phrasebook
-            </motion.button>
-          </motion.div>
-
-          {/* Tab Content - Uses AnimatePresence for smooth transitions between tabs */}
-          <AnimatePresence mode="wait">
-            {activeTab === 'live' && (
-              <motion.div
-                key="live-translator"
-                className="grid md:grid-cols-2 gap-8 max-w-7xl mx-auto"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                {/* Input Card */}
-                <motion.div 
-                  className="bg-white/90 backdrop-blur-sm p-8 rounded-3xl shadow-2xl border border-white/20"
-                  whileHover={{ scale: 1.02, y: -5 }}
-                  transition={{ duration: 0.3 }}
+    return (
+        <>
+            <ProfessionalNavbar />
+            
+            <div className="translator-page">
+                {/* Enhanced Translator Hero Section */}
+                <motion.section 
+                    className="translator-hero"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.8 }}
                 >
-                  <h2 className="text-3xl font-display font-bold flex items-center gap-3 mb-6 text-gray-800">
-                    <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl text-white">
-                      <Languages size={24} />
-                    </div>
-                    Translate
-                  </h2>
-
-                  <div className="flex justify-between items-center gap-3 mb-6">
-                    <motion.select
-                      className="flex-1 border-2 border-gray-200 bg-white/80 backdrop-blur-sm px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all cursor-pointer text-gray-700 font-medium"
-                      value={fromLang}
-                      onChange={(e) => setFromLang(e.target.value)}
-                      whileHover={{ scale: 1.02 }}
+                    <div className="translator-hero-background"></div>
+                    <div className="translator-hero-overlay"></div>
+                    
+                    <motion.div 
+                        className="translator-hero-content"
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
                     >
-                      {availableLanguages.map(lang => (
-                        <option key={lang} value={lang}>{lang}</option>
-                      ))}
-                    </motion.select>
-                    <motion.button
-                      onClick={swapLanguages}
-                      className="p-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 transition-all shadow-lg"
-                      whileHover={{ scale: 1.1, rotate: 180 }}
-                      whileTap={{ scale: 0.9 }}
-                      aria-label="Swap languages"
-                    >
-                      <ArrowLeftRight size={20} />
-                    </motion.button>
-                    <motion.select
-                      className="flex-1 border-2 border-gray-200 bg-white/80 backdrop-blur-sm px-4 py-3 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all cursor-pointer text-gray-700 font-medium"
-                      value={toLang}
-                      onChange={(e) => setToLang(e.target.value)}
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      {availableLanguages.map(lang => (
-                        <option key={lang} value={lang}>{lang}</option>
-                      ))}
-                    </motion.select>
-                  </div>
-
-                  <motion.textarea
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    placeholder="Enter text here..."
-                    className="w-full border-2 border-gray-200 bg-white/80 backdrop-blur-sm rounded-xl p-6 h-48 resize-none mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-lg text-gray-700 font-body"
-                  />
-                  <motion.button
-                    onClick={handleTranslate}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl w-full font-bold text-xl shadow-xl hover:from-blue-700 hover:to-purple-700 transition-all flex items-center justify-center gap-3"
-                    whileHover={{ scale: 1.02, y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <ArrowRight size={24} /> Translate Now
-                  </motion.button>
-                </motion.div>
-
-                {/* Recent Translations Card */}
-                <motion.div 
-                  className="bg-white/90 backdrop-blur-sm p-8 rounded-3xl shadow-2xl border border-white/20"
-                  whileHover={{ scale: 1.02, y: -5 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <h2 className="text-3xl font-display font-bold mb-6 text-gray-800">Recent Translations</h2>
-                  {translations.length === 0 ? (
-                    <div className="text-center py-16">
-                      <Globe className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                      <p className="text-gray-500 font-body text-lg">Your recent translations will appear here.</p>
-                    </div>
-                  ) : (
-                    <motion.ul className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                      {translations.map((t, idx) => (
-                        <motion.li 
-                          key={idx} 
-                          className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl shadow-lg border border-blue-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: idx * 0.1 }}
+                        <motion.h1 
+                            className="translator-hero-title"
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.4 }}
                         >
-                          <div className="flex-1">
-                            <p className="text-sm font-bold text-blue-600 mb-2">From: {t.from} → To: {t.to}</p>
-                            <p className="text-lg font-semibold text-gray-800 mb-2">{t.original}</p>
-                            <p className="text-xl text-gray-700 font-bold">{t.result}</p>
-                          </div>
-                          <div className="flex gap-3 self-end sm:self-center">
-                            <motion.button 
-                              onClick={() => speakText(t.result, t.to)} 
-                              whileHover={{ scale: 1.15 }} 
-                              whileTap={{ scale: 0.9 }} 
-                              className="p-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 transition-all shadow-lg"
-                              aria-label="Listen to translation"
-                            >
-                              <Volume2 size={20} />
-                            </motion.button>
-                            <motion.button 
-                              onClick={() => copyText(t.result)} 
-                              whileHover={{ scale: 1.15 }} 
-                              whileTap={{ scale: 0.9 }} 
-                              className="p-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 text-white hover:from-purple-600 hover:to-pink-700 transition-all shadow-lg"
-                              aria-label="Copy translation"
-                            >
-                              <FaCopy size={20} />
-                            </motion.button>
-                          </div>
-                        </motion.li>
-                      ))}
-                    </motion.ul>
-                  )}
-                </motion.div>
-              </motion.div>
-            )}
+                            Break Language Barriers
+                        </motion.h1>
+                        <motion.p 
+                            className="translator-hero-subtitle"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.6 }}
+                        >
+                            Experience the world's most advanced AI-powered translation service. 
+                            Translate text, voice, and images in real-time across 100+ languages with perfect accuracy.
+                        </motion.p>
 
-            {activeTab === 'phrasebook' && (
-              <motion.div
-                key="phrasebook"
-                className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                {phrasebookData.map((item, idx) => (
-                  <motion.div
-                    key={idx}
-                    className="bg-white/90 backdrop-blur-sm shadow-2xl rounded-3xl p-6 flex flex-col border border-white/20 group hover:shadow-3xl transition-all duration-500"
-                    initial={{ opacity: 0, y: 40 }}
+                        {/* Translation Mode Selector */}
+                        <motion.div 
+                            className="translation-modes"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.8 }}
+                            variants={staggerContainer}
+                        >
+                            {translationModes.map((mode, index) => (
+                                <motion.button
+                                    key={mode.id}
+                                    className={`translation-mode-btn ${translationMode === mode.id ? 'active' : ''}`}
+                                    variants={staggerItem}
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => setTranslationMode(mode.id)}
+                                >
+                                    {mode.icon}
+                                    <div className="mode-content">
+                                        <span className="mode-label">{mode.label}</span>
+                                        <span className="mode-description">{mode.description}</span>
+                                    </div>
+                                </motion.button>
+                            ))}
+                        </motion.div>
+                    </motion.div>
+                </motion.section>
+
+                {/* Enhanced Translation Interface */}
+                <motion.section 
+                    className="translation-interface"
+                    initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.1, duration: 0.6 }}
-                    whileHover={{ scale: 1.03, y: -8 }}
-                  >
-                    {/* Tag */}
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg text-white">
-                        {item.icon}
-                      </div>
-                      <span className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">
-                        {item.category}
-                      </span>
+                    transition={{ duration: 0.8, delay: 0.4 }}
+                >
+                    <div className="translation-container">
+                        <div className="translation-card">
+                            {/* Language Selectors */}
+                            <div className="language-selectors">
+                                <div className="language-selector">
+                                    <select 
+                                        value={selectedFromLang}
+                                        onChange={(e) => setSelectedFromLang(e.target.value)}
+                                        className="language-select"
+                                    >
+                                        {popularLanguages.map(lang => (
+                                            <option key={lang.code} value={lang.code}>
+                                                {lang.flag} {lang.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <motion.button 
+                                    className="swap-languages-btn"
+                                    whileHover={{ scale: 1.1, rotate: 180 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={swapLanguages}
+                                >
+                                    <ArrowRightLeft className="swap-icon" />
+                                </motion.button>
+
+                                <div className="language-selector">
+                                    <select 
+                                        value={selectedToLang}
+                                        onChange={(e) => setSelectedToLang(e.target.value)}
+                                        className="language-select"
+                                    >
+                                        {popularLanguages.map(lang => (
+                                            <option key={lang.code} value={lang.code}>
+                                                {lang.flag} {lang.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* Translation Areas */}
+                            <div className="translation-areas">
+                                <div className="input-area">
+                                    <div className="area-header">
+                                        <span className="area-title">Enter text to translate</span>
+                                        <div className="area-controls">
+                                            <motion.button 
+                                                className={`control-btn ${isRecording ? 'recording' : ''}`}
+                                                whileHover={{ scale: 1.1 }}
+                                                whileTap={{ scale: 0.9 }}
+                                                onClick={() => setIsRecording(!isRecording)}
+                                            >
+                                                {isRecording ? <MicOff /> : <Mic />}
+                                            </motion.button>
+                                            <motion.button 
+                                                className="control-btn"
+                                                whileHover={{ scale: 1.1 }}
+                                                whileTap={{ scale: 0.9 }}
+                                            >
+                                                <Camera />
+                                            </motion.button>
+                                        </div>
+                                    </div>
+                                    <textarea
+                                        className="translation-input"
+                                        placeholder="Type your text here..."
+                                        value={inputText}
+                                        onChange={(e) => setInputText(e.target.value)}
+                                        rows={4}
+                                    />
+                                </div>
+
+                                <div className="output-area">
+                                    <div className="area-header">
+                                        <span className="area-title">Translation</span>
+                                        <div className="area-controls">
+                                            <motion.button 
+                                                className="control-btn"
+                                                whileHover={{ scale: 1.1 }}
+                                                whileTap={{ scale: 0.9 }}
+                                                onClick={() => copyToClipboard(translatedText)}
+                                            >
+                                                <Copy />
+                                            </motion.button>
+                                            <motion.button 
+                                                className="control-btn"
+                                                whileHover={{ scale: 1.1 }}
+                                                whileTap={{ scale: 0.9 }}
+                                            >
+                                                <Volume2 />
+                                            </motion.button>
+                                            <motion.button 
+                                                className="control-btn"
+                                                whileHover={{ scale: 1.1 }}
+                                                whileTap={{ scale: 0.9 }}
+                                            >
+                                                <Share2 />
+                                            </motion.button>
+                                        </div>
+                                    </div>
+                                    <div className="translation-output">
+                                        {translatedText || 'Translation will appear here...'}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Translate Button */}
+                            <motion.button 
+                                className="translate-btn"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={handleTranslate}
+                                disabled={!inputText.trim()}
+                            >
+                                <Languages className="translate-icon" />
+                                Translate Now
+                            </motion.button>
+                        </div>
                     </div>
-            
-                    {/* Language and Phrase */}
-                    <div className="mb-4">
-                      <p className="text-sm mb-2 text-gray-600 font-medium">{item.language}</p>
-                      <p className="text-2xl font-bold text-gray-800 mb-2">{item.phrase}</p>
-                      <p className="text-base text-gray-700">
-                        English: <strong className="text-blue-600">{item.translation}</strong>
-                      </p>
+                </motion.section>
+
+                {/* Translator Features Showcase */}
+                <motion.section 
+                    className="translator-features-section"
+                    variants={staggerContainer}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true }}
+                >
+                    <div className="translator-features-container">
+                        <motion.div 
+                            className="section-header"
+                            variants={staggerItem}
+                        >
+                            <h2 className="section-title">Advanced Translation Features</h2>
+                            <p className="section-subtitle">
+                                Powered by cutting-edge AI technology for the most accurate translations
+                            </p>
+                        </motion.div>
+
+                        <div className="translator-features-grid">
+                            {translatorFeatures.map((feature, index) => (
+                                <motion.div
+                                    key={feature.id}
+                                    className="translator-feature-card"
+                                    variants={staggerItem}
+                                    whileHover={{ 
+                                        y: -10, 
+                                        scale: 1.02,
+                                        transition: { duration: 0.3 }
+                                    }}
+                                >
+                                    <div 
+                                        className="translator-feature-image"
+                                        style={{
+                                            backgroundImage: `url(${feature.image})`
+                                        }}
+                                    >
+                                        <div className="translator-feature-overlay">
+                                            <div className="translator-feature-icon">
+                                                {feature.icon}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="translator-feature-content">
+                                        <h3 className="translator-feature-title">{feature.name}</h3>
+                                        <p className="translator-feature-description">{feature.description}</p>
+                                        
+                                        <div className="translator-feature-benefits">
+                                            {feature.benefits.map((benefit, benefitIndex) => (
+                                                <div key={benefitIndex} className="translator-benefit-item">
+                                                    <Sparkles className="benefit-check" />
+                                                    <span>{benefit}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
                     </div>
-            
-                    {/* Example box */}
-                    <div className="text-sm italic p-4 rounded-xl border border-gray-200 flex-grow mb-4 bg-gradient-to-r from-blue-50 to-purple-50">
-                      <p className="leading-relaxed">
-                        <strong className="text-blue-600">Example</strong>: {item.example}
-                      </p>
-                    </div>
-            
-                    {/* Action buttons */}
-                    <div className="flex gap-3 justify-end mt-auto">
-                      <motion.button
-                        onClick={() => speakText(item.phrase, item.language)}
-                        whileHover={{ scale: 1.15 }}
-                        whileTap={{ scale: 0.9 }}
-                        className="p-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white transition-all shadow-lg"
-                        aria-label="Listen to phrase"
-                      >
-                        <Volume2 size={20} />
-                      </motion.button>
-            
-                      <motion.button
-                        onClick={() => copyText(item.phrase)}
-                        whileHover={{ scale: 1.15 }}
-                        whileTap={{ scale: 0.9 }}
-                        className="p-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 text-white transition-all shadow-lg"
-                        aria-label="Copy phrase"
-                      >
-                        <FaCopy size={20} />
-                      </motion.button>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+                </motion.section>
 
-          {/* Copy Success Message */}
-          <AnimatePresence>
-            {showCopyMessage && (
-              <motion.div
-                initial={{ opacity: 0, y: 50, scale: 0.8 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 50, scale: 0.8 }}
-                transition={{ duration: 0.3 }}
-                className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-8 py-4 rounded-full shadow-2xl text-lg font-bold z-50"
-              >
-                Copied to clipboard! ✨
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+                {/* Recent Translations */}
+                {recentTranslations.length > 0 && (
+                    <motion.section 
+                        className="recent-translations-section"
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                    >
+                        <div className="recent-translations-container">
+                            <h3 className="recent-title">Recent Translations</h3>
+                            <div className="recent-translations-list">
+                                {recentTranslations.map((translation, index) => (
+                                    <motion.div 
+                                        key={index}
+                                        className="recent-translation-item"
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                                    >
+                                        <div className="translation-pair">
+                                            <div className="original-text">{translation.from}</div>
+                                            <ArrowRight className="translation-arrow" />
+                                            <div className="translated-text">{translation.to}</div>
+                                        </div>
+                                        <div className="translation-langs">
+                                            {popularLanguages.find(l => l.code === translation.fromLang)?.flag} → {popularLanguages.find(l => l.code === translation.toLang)?.flag}
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </div>
+                    </motion.section>
+                )}
+            </div>
 
-        {/* Translation Tips Section */}
-        <section className="py-20 rounded-3xl mx-4 md:mx-12 my-16 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 shadow-2xl">
-          <motion.h2
-            className="text-center text-4xl sm:text-5xl font-display font-bold mb-16 text-white drop-shadow-lg"
-            initial={{ opacity: 0, y: -30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-          >
-            Boost Your Communication
-          </motion.h2>
+            {/* Enhanced Chatbot Widget - Bottom Left */}
+            <ChatbotWidget />
 
-          <motion.div
-            className="flex flex-col md:flex-row justify-around items-center gap-10 px-6 max-w-7xl mx-auto"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={{
-              hidden: {},
-              visible: {
-                transition: { staggerChildren: 0.2 }
-              }
-            }}
-          >
-            {/* Tip Card 1 */}
-            <motion.div
-              className="flex flex-col items-center text-center max-w-xs p-8 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 hover:bg-white/20 transition-all duration-300"
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                visible: { opacity: 1, y: 0 }
-              }}
-              whileHover={{ scale: 1.05, y: -5 }}
-            >
-              <div className="text-white rounded-full p-6 mb-6 bg-white/20 backdrop-blur-sm">
-                <Languages className="w-10 h-10" />
-              </div>
-              <h3 className="font-bold text-2xl mb-4 text-white">
-                Context Matters
-              </h3>
-              <p className="text-blue-100 leading-relaxed text-lg">
-                Provide context for better translations. Short, clear phrases work best for accuracy.
-              </p>
-            </motion.div>
-
-            {/* Tip Card 2 */}
-            <motion.div
-              className="flex flex-col items-center text-center max-w-xs p-8 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 hover:bg-white/20 transition-all duration-300"
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                visible: { opacity: 1, y: 0 }
-              }}
-              whileHover={{ scale: 1.05, y: -5 }}
-            >
-              <div className="text-white rounded-full p-6 mb-6 bg-white/20 backdrop-blur-sm">
-                <Volume2 className="w-10 h-10" />
-              </div>
-              <h3 className="font-bold text-2xl mb-4 text-white">
-                Practice Pronunciation
-              </h3>
-              <p className="text-blue-100 leading-relaxed text-lg">
-                Utilize the audio feature to learn correct pronunciation of translated phrases effectively.
-              </p>
-            </motion.div>
-
-            {/* Tip Card 3 */}
-            <motion.div
-              className="flex flex-col items-center text-center max-w-xs p-8 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 hover:bg-white/20 transition-all duration-300"
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                visible: { opacity: 1, y: 0 }
-              }}
-              whileHover={{ scale: 1.05, y: -5 }}
-            >
-              <div className="text-white rounded-full p-6 mb-6 bg-white/20 backdrop-blur-sm">
-                <BookMarked className="w-10 h-10" />
-              </div>
-              <h3 className="font-bold text-2xl mb-4 text-white">
-                Save for Later
-              </h3>
-              <p className="text-blue-100 leading-relaxed text-lg">
-                Bookmark useful translations and frequently used phrases for quick access during your travels.
-              </p>
-            </motion.div>
-          </motion.div>
-        </section>
-
-        <Footer />
-      </div>
-    </>
-  );
+            <Footer />
+        </>
+    );
 }
+export default Translator;

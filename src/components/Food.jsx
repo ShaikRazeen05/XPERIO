@@ -1,479 +1,495 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Heart, Star, MapPin, Clock, Play, Users, TrendingUp, Globe, Sparkles, Zap } from 'lucide-react';
-import Navbar from './Navbar';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Search, Filter, MapPin, Clock, Star, Heart, ArrowRight, Utensils, 
+  Coffee, Pizza, Sandwich, Camera, Share2, Globe, Eye, Phone,
+  Bot, X, SendHorizontal, MessageCircle
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import ProfessionalNavbar from './ProfessionalNavbar';
+import AdvancedChatbot from './AdvancedChatbot';
 import Footer from './Footer';
-import { motion } from 'framer-motion';
+import './food.css';
 
 export function Food() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All Categories');
-  const [ratingFilter, setRatingFilter] = useState('Highest Rated');
-  const [favorites, setFavorites] = useState(new Set());
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [hoveredCard, setHoveredCard] = useState(null);
-  const [isSearching, setIsSearching] = useState(false);
-  
-  const features = [
-    {
-      icon: <Play className="w-8 h-8 mx-auto mb-3 text-orange-500" />,
-      title: "Watch Food Videos",
-      subtitle: "Street food in action"
-    },
-    {
-      icon: <Users className="w-8 h-8 mx-auto mb-3 text-orange-500" />,
-      title: "Community Reviews",
-      subtitle: "Real foodie experiences"
-    },
-    {
-      icon: <TrendingUp className="w-8 h-8 mx-auto mb-3 text-orange-500" />,
-      title: "Trending Spots",
-      subtitle: "Discover hidden gems"
-    }
-  ];
-  
-  // Trigger entrance animations on mount
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoaded(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
+    const navigate = useNavigate();
+    const [selectedFilter, setSelectedFilter] = useState('all');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [favorites, setFavorites] = useState(new Set());
+    const [chatbotOpen, setChatbotOpen] = useState(false);
 
-  // Simulate search loading
-  useEffect(() => {
-    if (searchQuery) {
-      setIsSearching(true);
-      const timer = setTimeout(() => setIsSearching(false), 600);
-      return () => clearTimeout(timer);
-    }
-  }, [searchQuery]);
+    const handleNavigation = (url) => {
+        navigate(url);
+    };
 
-  const toggleFavorite = (id) => {
-    const newFavorites = new Set(favorites);
-    if (newFavorites.has(id)) {
-      newFavorites.delete(id);
-    } else {
-      newFavorites.add(id);
-    }
-    setFavorites(newFavorites);
-  };
+    const toggleFavorite = (id) => {
+        setFavorites(prev => {
+            const newFavorites = new Set(prev);
+            if (newFavorites.has(id)) {
+                newFavorites.delete(id);
+            } else {
+                newFavorites.add(id);
+            }
+            return newFavorites;
+        });
+    };
 
-  const vendors = [
-    {
-      id: 1,
-      name: "Osaka Octopus Balls",
-      cuisine: "Japanese",
-      rating: 4.9,
-      reviews: 1164,
-      description: "Crispy hot takoyaki octopus balls with a crispy exterior and creamy interior, topped with savory sauce and bonito flakes.",
-      location: "Downtown Street, Osaka",
-      image: "https://images.unsplash.com/photo-1559847844-5315695dadae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-      emoji: "🐙",
-      category: "Asian"
-    },
-    {
-      id: 2,
-      name: "El Fuego Tacos",
-      cuisine: "Mexican",
-      rating: 4.8,
-      reviews: 1230,
-      description: "Authentic Mexican street tacos with handmade tortillas and fresh salsa. A local favorite for late night cravings.",
-      location: "Near Zocalo Square, Mexico City",
-      image: "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-      emoji: "🌮",
-      category: "Mexican"
-    },
-    {
-      id: 3,
-      name: "Green Grub",
-      cuisine: "Vegan",
-      rating: 4.7,
-      reviews: 758,
-      description: "Innovative plant-based burgers and loaded sweet potato fries. Delicious and sustainable street food options.",
-      location: "Near Meatpacking Market, Berlin",
-      image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-      emoji: "🥗",
-      category: "Vegan"
-    },
-    {
-      id: 4,
-      name: "La Crêpe Enchantée",
-      cuisine: "French",
-      rating: 4.6,
-      reviews: 1486,
-      description: "Sweet and savory crêpes made to order, a true taste of Parisian street food culture and tradition.",
-      location: "By the Eiffel Tower, Paris",
-      image: "https://images.unsplash.com/photo-1506084868230-bb9d95c24759?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-      emoji: "🥞",
-      category: "European"
-    },
-    {
-      id: 5,
-      name: "Bangkok Bites",
-      cuisine: "Thai",
-      rating: 4.5,
-      reviews: 943,
-      description: "Serving classic Pad Thai and spicy Tom Yum noodles from a bustling street cart. Fresh, spicy, and flavorful.",
-      location: "Sukhumvit Soi 38, Bangkok",
-      image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-      emoji: "🍜",
-      category: "Asian"
-    },
-    {
-      id: 6,
-      name: "Fromage & Co",
-      cuisine: "French",
-      rating: 4.6,
-      reviews: 1486,
-      description: "Artisanal cheese platters and wine pairings in a cozy Parisian setting. Perfect for cheese lovers.",
-      location: "Montmartre District, Paris",
-      image: "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
-      emoji: "🧀",
-      category: "European"
-    }
-  ];
+    // Food discovery data with premium images[1][2][3]
+    const foodFilters = [
+        { id: 'all', label: 'All Cuisine', icon: '🍽️' },
+        { id: 'street', label: 'Street Food', icon: '🌮' },
+        { id: 'fine-dining', label: 'Fine Dining', icon: '🍾' },
+        { id: 'local', label: 'Local Favorites', icon: '🏪' },
+        { id: 'desserts', label: 'Desserts', icon: '🧁' },
+        { id: 'vegan', label: 'Plant-Based', icon: '🥗' },
+        { id: 'seafood', label: 'Seafood', icon: '🦞' },
+        { id: 'bbq', label: 'BBQ & Grill', icon: '🔥' }
+    ];
 
-  const categories = ['All Categories', 'Asian', 'Mexican', 'Vegan', 'European', 'Indian', 'American'];
-  const ratingOptions = ['Highest Rated', 'Most Reviews', 'Newest', 'Price: Low to High'];
+    const foodDiscoveries = [
+        {
+            id: 1,
+            name: "Nonna's Secret Pasta",
+            description: "Authentic Italian pasta made with 100-year-old family recipe. Hidden gem in Little Italy with handmade pasta daily.",
+            image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?auto=format&fit=crop&w=800&q=80",
+            category: 'fine-dining',
+            rating: 4.9,
+            distance: "0.8 km",
+            priceRange: "$$-$$$",
+            tags: ['Authentic', 'Handmade', 'Family Recipe'],
+            location: "Little Italy District",
+            specialty: "Truffle Carbonara"
+        },
+        {
+            id: 2,
+            name: "Street Taco Paradise",
+            description: "Award-winning street tacos with locally sourced ingredients. Experience authentic Mexican flavors from this food truck legend.",
+            image: "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?auto=format&fit=crop&w=800&q=80",
+            category: 'street',
+            rating: 4.8,
+            distance: "1.2 km",
+            priceRange: "$",
+            tags: ['Street Food', 'Authentic', 'Local Favorite'],
+            location: "Food Truck Plaza",
+            specialty: "Carnitas Tacos"
+        },
+        {
+            id: 3,
+            name: "Ocean's Bounty",
+            description: "Fresh daily catch prepared by master sushi chefs. Premium seafood experience with sustainable sourcing practices.",
+            image: "https://images.unsplash.com/photo-1579952363873-27d3bfad9c0d?auto=format&fit=crop&w=800&q=80",
+            category: 'seafood',
+            rating: 4.9,
+            distance: "2.1 km",
+            priceRange: "$$$-$$$$",
+            tags: ['Fresh', 'Sustainable', 'Premium'],
+            location: "Harbor District",
+            specialty: "Omakase Sushi"
+        },
+        {
+            id: 4,
+            name: "Plant Power Bowl",
+            description: "Revolutionary plant-based cuisine that redefines vegan dining. Innovative flavors using locally grown organic produce.",
+            image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80",
+            category: 'vegan',
+            rating: 4.7,
+            distance: "0.9 km",
+            priceRange: "$$",
+            tags: ['Vegan', 'Organic', 'Innovative'],
+            location: "Green Quarter",
+            specialty: "Buddha Bowl Supreme"
+        },
+        {
+            id: 5,
+            name: "Sweet Dreams Patisserie",
+            description: "French-inspired desserts crafted by award-winning pastry chefs. Artisanal sweets that are almost too beautiful to eat.",
+            image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=800&q=80",
+            category: 'desserts',
+            rating: 4.8,
+            distance: "1.5 km",
+            priceRange: "$$",
+            tags: ['Artisanal', 'French', 'Award-winning'],
+            location: "Arts District",
+            specialty: "Lavender Macarons"
+        },
+        {
+            id: 6,
+            name: "Smokehouse Legend",
+            description: "Low and slow BBQ perfection with signature dry rubs and house-made sauces. Traditional smoking techniques meet modern flavors.",
+            image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
+            category: 'bbq',
+            rating: 4.8,
+            distance: "3.2 km",
+            priceRange: "$$",
+            tags: ['BBQ', 'Traditional', 'House-made'],
+            location: "Industrial Quarter",
+            specialty: "Smoked Brisket"
+        },
+        {
+            id: 7,
+            name: "Grandma's Kitchen",
+            description: "Home-style comfort food that brings back childhood memories. Traditional recipes passed down through generations.",
+            image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80",
+            category: 'local',
+            rating: 4.6,
+            distance: "0.7 km",
+            priceRange: "$-$$",
+            tags: ['Comfort Food', 'Traditional', 'Family'],
+            location: "Old Town",
+            specialty: "Chicken & Dumplings"
+        },
+        {
+            id: 8,
+            name: "Spice Route Express",
+            description: "Authentic Indian street food with bold spices and traditional cooking methods. Experience the flavors of Mumbai's streets.",
+            image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=800&q=80",
+            category: 'street',
+            rating: 4.7,
+            distance: "1.8 km",
+            priceRange: "$",
+            tags: ['Indian', 'Spicy', 'Authentic'],
+            location: "Spice Market",
+            specialty: "Butter Chicken"
+        }
+    ];
 
-  return (
-    <>
-      <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 text-gray-800 font-sans">
-        {/* Banner Image Section */}
-        <motion.div
-          className="relative w-full h-48 sm:h-64 md:h-80 flex items-center justify-center mb-8 overflow-hidden"
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-        >
-          <img
-            src="/pictures_homepage/food_banner.png"
-            alt="Food Banner"
-            className="absolute inset-0 w-full h-full object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-orange-900/60 via-red-900/40 to-yellow-900/30"></div>
-          <div className="relative z-10 text-center px-4">
-            <motion.div
-              className="flex items-center justify-center gap-3 mb-4"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-            >
-              <Sparkles className="w-10 h-10 text-orange-400" />
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-display font-bold text-white drop-shadow-lg">
-                Explore World Street Food
-              </h1>
-              <Zap className="w-10 h-10 text-yellow-400" />
-            </motion.div>
-            <motion.p 
-              className="text-xl sm:text-2xl text-white/90 max-w-3xl mx-auto font-body leading-relaxed"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.6 }}
-            >
-              Discover trending vendors, authentic flavors, and foodie adventures from every corner of the globe.
-            </motion.p>
-          </div>
-        </motion.div>
+    const filteredFood = foodDiscoveries.filter(food => {
+        const matchesFilter = selectedFilter === 'all' || food.category === selectedFilter;
+        const matchesSearch = food.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            food.description.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesFilter && matchesSearch;
+    });
 
-        {/* Enhanced Header */}
+    // Animation variants
+    const staggerContainer = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const staggerItem = {
+        hidden: { opacity: 0, y: 50 },
+        show: { 
+            opacity: 1, 
+            y: 0,
+            transition: {
+                duration: 0.6,
+                ease: "easeOut"
+            }
+        }
+    };
+
+    // Enhanced Chatbot Component
+    const ChatbotWidget = () => (
         <motion.div 
-          className="text-gray-900 shadow-lg transform-gpu transition-all duration-700"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+            className="chatbot-widget"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3 }}
         >
-          <div className="max-w-7xl mx-auto px-6 py-16">
-            <div className="text-center mb-12">
-              <motion.div 
-                className="inline-flex items-center gap-4 mb-6"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-              >
-                <span className="text-5xl">🍜</span>
-                <h1 className="text-6xl md:text-7xl font-display font-bold text-gray-900">
-                  XperioFood
-                </h1>
-                <span className="text-5xl">🌮</span>
-              </motion.div>
-              <motion.p 
-                className="text-2xl md:text-3xl text-gray-700 max-w-4xl mx-auto mb-8 leading-relaxed font-body"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-              >
-                <span className="font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                  Embark on a culinary adventure
-                </span> across global street food scenes! From bustling Bangkok markets to vibrant Mexican plazas -{' '}
-                <span className="font-bold text-orange-600">taste authentic flavors</span>,{' '}
-                <span className="font-bold text-red-600">watch cooking videos</span>, and{' '}
-                <span className="font-bold text-yellow-600">connect with food lovers worldwide</span> 🌍✨
-              </motion.p>
-              
-              {/* Feature Cards */}
-              <motion.div 
-                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-12"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.8 }}
-              >
-                {features.map((f, i) => (
-                  <motion.div
-                    key={f.title}
-                    className="bg-white/80 backdrop-blur-sm border border-orange-200 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 group"
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.8 + i * 0.1, duration: 0.6 }}
-                    whileHover={{ scale: 1.05, y: -5 }}
-                  >
-                    <div className="text-center">
-                      <div className="p-4 bg-gradient-to-r from-orange-100 to-red-100 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                        {f.icon}
-                      </div>
-                      <div className="text-xl font-bold text-gray-900 mb-2">{f.title}</div>
-                      <div className="text-orange-600 font-medium">{f.subtitle}</div>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </div>
-          </div>
-        </motion.div>
+            <AnimatePresence>
+                {chatbotOpen && (
+                    <motion.div
+                        className="chatbot-window"
+                        initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 50, scale: 0.9 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <div className="chatbot-header">
+                            <div className="chatbot-info">
+                                <div className="bot-avatar">
+                                    <Bot className="bot-icon" />
+                                    <div className="status-indicator"></div>
+                                </div>
+                                <div>
+                                    <h4>Food Discovery AI</h4>
+                                    <p>Finding perfect meals for you</p>
+                                </div>
+                            </div>
+                            <button 
+                                className="close-chatbot"
+                                onClick={() => setChatbotOpen(false)}
+                            >
+                                <X className="close-icon" />
+                            </button>
+                        </div>
 
-        {/* Hero Section */}
-        <motion.div 
-          className="relative text-gray-900 mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.0 }}
-        >
-          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
-          <div className="relative max-w-7xl mx-auto px-6 py-20 flex items-center min-h-[400px]">
-            <div className="max-w-2xl">
-              <h2 className="text-5xl lg:text-6xl font-display font-bold mb-6 bg-gradient-to-r from-orange-600 via-red-600 to-yellow-600 bg-clip-text text-transparent">
-                Taste the World's Flavors
-              </h2>
-              <p className="text-2xl mb-8 text-gray-700 font-body leading-relaxed">
-                From Bangkok street vendors to Mexico City tacos, discover authentic flavors and hidden culinary gems.
-              </p>
-              <motion.button 
-                className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-10 py-4 rounded-2xl font-bold text-xl shadow-xl hover:shadow-2xl transition-all duration-300"
-                whileHover={{ scale: 1.05, y: -3 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Start Exploring
-              </motion.button>
-            </div>
-          </div>
-        </motion.div>
+                        <div className="chatbot-messages">
+                            <motion.div 
+                                className="message bot-message"
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.2 }}
+                            >
+                                <div className="message-avatar">
+                                    <Utensils className="avatar-icon" />
+                                </div>
+                                <div className="message-content">
+                                    <p>I'm your personal food discovery assistant! I can help you find:</p>
+                                    <div className="quick-actions">
+                                        <button className="quick-btn" onClick={() => setSelectedFilter('street')}>
+                                            🌮 Street Food
+                                        </button>
+                                        <button className="quick-btn" onClick={() => setSelectedFilter('fine-dining')}>
+                                            🍾 Fine Dining
+                                        </button>
+                                        <button className="quick-btn" onClick={() => setSelectedFilter('vegan')}>
+                                            🥗 Plant-Based
+                                        </button>
+                                        <button className="quick-btn" onClick={() => setSelectedFilter('desserts')}>
+                                            🧁 Desserts
+                                        </button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </div>
 
-        {/* Search and Filters */}
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <motion.div 
-            className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 mb-12 border border-orange-200"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.2 }}
-          >
-            <div className="flex flex-col lg:flex-row gap-6 items-center">
-              <div className="flex-1 relative group">
-                <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6 transition-all duration-300 ${isSearching ? 'text-orange-500 animate-pulse' : ''}`} />
-                <input
-                  type="text"
-                  placeholder="Search food vendors..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-lg font-medium transition-all duration-300"
-                />
-                {isSearching && (
-                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-orange-500 border-t-transparent"></div>
-                  </div>
+                        <div className="chatbot-input">
+                            <input 
+                                type="text" 
+                                placeholder="What food are you craving?"
+                                className="chat-input-field"
+                            />
+                            <button className="send-btn">
+                                <SendHorizontal className="send-icon" />
+                            </button>
+                        </div>
+                    </motion.div>
                 )}
-              </div>
-              
-              <select 
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-orange-500 min-w-[180px] hover:border-orange-300 transition-all duration-300 text-lg font-medium"
-              >
-                {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
-              </select>
-              
-              <select 
-                value={ratingFilter}
-                onChange={(e) => setRatingFilter(e.target.value)}
-                className="px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-orange-500 min-w-[180px] hover:border-orange-300 transition-all duration-300 text-lg font-medium"
-              >
-                {ratingOptions.map(option => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-              
-              <motion.button 
-                className="flex items-center gap-3 px-8 py-4 border-2 border-gray-200 rounded-2xl hover:border-orange-300 transition-all duration-300 text-lg font-medium bg-white/80 backdrop-blur-sm"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Filter className="w-5 h-5" />
-                More Filters
-              </motion.button>
-            </div>
-          </motion.div>
+            </AnimatePresence>
 
-          {/* Stats */}
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.4 }}
-          >
-            <motion.div 
-              className="bg-gradient-to-r from-emerald-100 to-green-100 rounded-3xl p-8 text-center shadow-xl border border-emerald-200"
-              whileHover={{ scale: 1.05, y: -5 }}
-              transition={{ duration: 0.3 }}
+            <motion.button
+                className="chatbot-trigger"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setChatbotOpen(!chatbotOpen)}
+                animate={{ 
+                    y: [0, -10, 0],
+                    transition: { duration: 2, repeat: Infinity }
+                }}
             >
-              <div className="text-4xl font-display font-bold text-emerald-800 mb-3">6+</div>
-              <div className="text-emerald-700 font-bold text-lg">Food Vendors</div>
-            </motion.div>
-            <motion.div 
-              className="bg-gradient-to-r from-blue-100 to-indigo-100 rounded-3xl p-8 text-center shadow-xl border border-blue-200"
-              whileHover={{ scale: 1.05, y: -5 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="text-4xl font-display font-bold text-blue-800 mb-3">6+</div>
-              <div className="text-blue-700 font-bold text-lg">Cities Covered</div>
-            </motion.div>
-            <motion.div 
-              className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-3xl p-8 text-center shadow-xl border border-purple-200"
-              whileHover={{ scale: 1.05, y: -5 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="text-4xl font-display font-bold text-purple-800 mb-3">7000+</div>
-              <div className="text-purple-700 font-bold text-lg">Reviews</div>
-            </motion.div>
-          </motion.div>
-
-          {/* Vendor Grid */}
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.6 }}
-          >
-            {vendors.map((vendor, index) => (
-              <motion.div 
-                key={vendor.id} 
-                className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-orange-200 overflow-hidden group hover:shadow-3xl transition-all duration-500"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.6 + index * 0.1, duration: 0.6 }}
-                whileHover={{ scale: 1.03, y: -8 }}
-                onMouseEnter={() => setHoveredCard(vendor.id)}
-                onMouseLeave={() => setHoveredCard(null)}
-              >
-                {/* Image Section */}
-                <div className="relative h-64 overflow-hidden">
-                  <img
-                    src={vendor.image}
-                    alt={vendor.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="absolute bottom-4 left-4 text-6xl">
-                      {vendor.emoji}
-                    </div>
-                  </div>
-                  <motion.button 
-                    onClick={() => toggleFavorite(vendor.id)}
-                    className={`absolute top-4 right-4 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg ${favorites.has(vendor.id) ? 'text-red-500' : 'text-gray-600 hover:text-red-400'} transition-all duration-300`}
-                    whileHover={{ scale: 1.15 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <Heart 
-                      className={`w-6 h-6 transition-all duration-300 ${
-                        favorites.has(vendor.id) 
-                          ? 'fill-red-500 text-red-500' 
-                          : 'text-gray-600 hover:text-red-400'
-                      }`} 
-                    />
-                  </motion.button>
-                </div>
-
-                {/* Content Section */}
-                <div className="p-8">
-                  <h3 className="text-2xl font-display font-bold text-gray-900 mb-4 hover:text-orange-600 transition-colors duration-300">
-                    {vendor.name}
-                  </h3>
-                  
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="flex items-center gap-2">
-                      <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                      <span className="font-bold text-gray-900 text-lg">{vendor.rating}</span>
-                    </div>
-                    <span className="text-gray-500">•</span>
-                    <span className="text-gray-600 hover:text-gray-800 transition-colors font-medium">{vendor.reviews} reviews</span>
-                  </div>
-                  
-                  <p className="text-gray-600 text-base mb-6 hover:text-gray-800 transition-colors duration-300 leading-relaxed font-body">
-                    {vendor.description}
-                  </p>
-                  
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center gap-2">
-                      <span className="bg-gradient-to-r from-orange-100 to-red-100 text-orange-800 px-4 py-2 rounded-full text-sm font-bold hover:scale-105 transition-transform cursor-pointer">
-                        {vendor.cuisine}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3 text-gray-600 hover:text-gray-800 transition-colors">
-                      <MapPin className="w-5 h-5 text-orange-500" />
-                      <span className="font-medium">{vendor.location}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-3">
-                    <motion.button 
-                      className="flex-1 px-6 py-3 border-2 border-gray-300 rounded-2xl text-gray-700 font-bold hover:border-orange-300 transition-all duration-300 bg-white/80 backdrop-blur-sm"
-                      whileHover={{ scale: 1.02, y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      View Details
-                    </motion.button>
-                    <motion.button 
-                      className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all duration-300"
-                      whileHover={{ scale: 1.02, y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      Watch
-                    </motion.button>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* Load More */}
-          <motion.div 
-            className="text-center"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 2.0 }}
-          >
-            <motion.button 
-              className="px-10 py-4 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-gray-300"
-              whileHover={{ scale: 1.05, y: -3 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Load More Vendors
+                <Utensils className="chatbot-icon" />
+                <motion.div 
+                    className="notification-badge"
+                    animate={{ 
+                        scale: [1, 1.2, 1],
+                        transition: { duration: 2, repeat: Infinity }
+                    }}
+                >
+                    3
+                </motion.div>
+                <div className="pulse-ring"></div>
             </motion.button>
-          </motion.div>
-        </div>
+        </motion.div>
+    );
 
-        <Footer />
-      </div>
-    </>
-  );
+    return (
+        <>
+            <ProfessionalNavbar />
+            
+            <div className="food-page">
+                {/* Enhanced Food Hero Section */}
+                <motion.section 
+                    className="food-hero"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.8 }}
+                >
+                    <div className="food-hero-background"></div>
+                    <div className="food-hero-overlay"></div>
+                    
+                    <motion.div 
+                        className="food-hero-content"
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                    >
+                        <motion.h1 
+                            className="food-hero-title"
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.4 }}
+                        >
+                            Discover Amazing Food
+                        </motion.h1>
+                        <motion.p 
+                            className="food-hero-subtitle"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.6 }}
+                        >
+                            Explore authentic local cuisine, hidden gems, and culinary adventures powered by AI recommendations
+                        </motion.p>
+
+                        {/* Enhanced Search Bar */}
+                        <motion.div 
+                            className="food-search-container"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.8 }}
+                        >
+                            <input
+                                type="text"
+                                placeholder="Search for cuisine, restaurant, or dish..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="food-search-input"
+                            />
+                            <Search className="search-icon" />
+                        </motion.div>
+
+                        {/* Enhanced Filter Buttons */}
+                        <motion.div 
+                            className="food-filters"
+                            variants={staggerContainer}
+                            initial="hidden"
+                            animate="show"
+                        >
+                            {foodFilters.map((filter, index) => (
+                                <motion.button
+                                    key={filter.id}
+                                    className={`food-filter-btn ${selectedFilter === filter.id ? 'active' : ''}`}
+                                    variants={staggerItem}
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => setSelectedFilter(filter.id)}
+                                >
+                                    <span className="filter-emoji">{filter.icon}</span>
+                                    {filter.label}
+                                </motion.button>
+                            ))}
+                        </motion.div>
+                    </motion.div>
+                </motion.section>
+
+                {/* Enhanced Food Grid */}
+                <motion.section 
+                    className="food-content"
+                    variants={staggerContainer}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true }}
+                >
+                    <div className="food-grid">
+                        {filteredFood.map((food, index) => (
+                            <motion.div
+                                key={food.id}
+                                className="food-card"
+                                variants={staggerItem}
+                                whileHover={{ 
+                                    y: -8, 
+                                    scale: 1.02,
+                                    transition: { duration: 0.3 }
+                                }}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                <div 
+                                    className="food-card-image"
+                                    style={{
+                                        backgroundImage: `url(${food.image})`,
+                                        height: '250px'
+                                    }}
+                                >
+                                    <motion.button
+                                        className={`favorite-btn ${favorites.has(food.id) ? 'favorited' : ''}`}
+                                        whileHover={{ scale: 1.1 }}
+                                        whileTap={{ scale: 0.9 }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            toggleFavorite(food.id);
+                                        }}
+                                    >
+                                        <Heart className="heart-icon" />
+                                    </motion.button>
+
+                                    <div className="food-card-overlay">
+                                        <div className="food-rating">
+                                            <Star className="star-icon" />
+                                            <span>{food.rating}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="food-card-content">
+                                    <div className="food-card-header">
+                                        <h3 className="food-card-title">{food.name}</h3>
+                                        <span className="food-card-specialty">{food.specialty}</span>
+                                    </div>
+
+                                    <p className="food-card-description">{food.description}</p>
+
+                                    <div className="food-card-tags">
+                                        {food.tags.map((tag, tagIndex) => (
+                                            <span key={tagIndex} className="food-tag">
+                                                {tag}
+                                            </span>
+                                        ))}
+                                    </div>
+
+                                    <div className="food-card-info">
+                                        <div className="info-item">
+                                            <MapPin className="food-icon" />
+                                            <span>{food.distance}</span>
+                                        </div>
+                                        <div className="info-item">
+                                            <Clock className="food-icon" />
+                                            <span>{food.priceRange}</span>
+                                        </div>
+                                        <div className="info-item">
+                                            <Globe className="food-icon" />
+                                            <span>{food.location}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="food-card-actions">
+                                        <motion.button 
+                                            className="action-btn primary-action"
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                        >
+                                            <Eye className="action-icon" />
+                                            View Details
+                                        </motion.button>
+                                        <motion.button 
+                                            className="action-btn secondary-action"
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                        >
+                                            <Phone className="action-icon" />
+                                            Call Now
+                                        </motion.button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </motion.section>
+
+                {/* No Results Message */}
+                {filteredFood.length === 0 && (
+                    <motion.div 
+                        className="no-results"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <Utensils className="no-results-icon" />
+                        <h3>No food discoveries found</h3>
+                        <p>Try adjusting your filters or search terms to find amazing food experiences!</p>
+                    </motion.div>
+                )}
+            </div>
+
+            {/* Enhanced Chatbot Widget - Bottom Left */}
+            <ChatbotWidget />
+
+            <Footer />
+        </>
+    );
 }
+export default Food;

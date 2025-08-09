@@ -1,564 +1,349 @@
-import React, { useState, useEffect } from 'react';
-import { FaGoogle, FaApple, FaGlobe } from 'react-icons/fa';
-import { HiSparkles } from 'react-icons/hi2';
-import { MdEmail, MdLock, MdHistory, MdBookmark, MdSubscriptions, MdSupport } from 'react-icons/md';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  User, Mail, Lock, Eye, EyeOff, ArrowRight, Star, Globe, Shield, 
+  CircleCheck, CircleAlert
+} from 'lucide-react';
+import { FaGoogle, FaFacebook, FaTwitter } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import './loginpage.css'; // Import your CSS file for styling
+const Loginpage = () => {
+  const navigate = useNavigate();
+  const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    name: '',
+    confirmPassword: ''
+  });
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
-const LoginPage = () => {
-    const [currentUser, setCurrentUser] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const [errors, setErrors] = useState({});
-    const [formData, setFormData] = useState({
-        username: '',
-        password: '',
-        rememberMe: false
-    });
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
 
-    useEffect(() => {
-        // Set body classes
-        document.body.classList.add('login-mode');
-        document.body.classList.remove('dashboard-mode');
-        
-        // Check existing session
-        checkExistingSession();
-        
-        return () => {
-            document.body.classList.remove('login-mode');
-        };
-    }, []);
+  const validateForm = () => {
+    const newErrors = {};
 
-    const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
-
-        // Clear error when user starts typing
-        if (errors[name]) {
-            setErrors(prev => ({
-                ...prev,
-                [name]: ''
-            }));
-        }
-    };
-
-    const validateForm = () => {
-        const newErrors = {};
-        
-        if (!formData.username.trim()) {
-            newErrors.username = 'Username or email is required';
-        } else if (!isValidEmail(formData.username) && formData.username.length < 3) {
-            newErrors.username = 'Please enter a valid email or username (min 3 characters)';
-        }
-        
-        if (!formData.password) {
-            newErrors.password = 'Password is required';
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'Password must be at least 6 characters long';
-        }
-        
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const isValidEmail = (email) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    };
-
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        
-        if (isLoading) return;
-        
-        if (!validateForm()) return;
-        
-        const { username, password, rememberMe } = formData;
-        
-        setIsLoading(true);
-        
-        try {
-            const result = await authenticateUser(username, password);
-            
-            if (result.success) {
-                setCurrentUser(result.user);
-                
-                if (rememberMe) {
-                    saveUserSession(result.user);
-                }
-                
-                showToast('Login successful! Welcome back!', 'success');
-                
-            } else {
-                handleAuthError(result.error);
-            }
-            
-        } catch (error) {
-            console.error('Login error:', error);
-            showToast('Network error. Please check your connection and try again.', 'error');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const authenticateUser = async (username, password) => {
-        await new Promise(resolve => setTimeout(resolve, 1200));
-        
-        const validUsers = {
-            'admin@example.com': { 
-                password: 'admin123', 
-                name: 'Admin User',
-                avatar: 'default-user',
-                role: 'admin'
-            },
-            'user@example.com': { 
-                password: 'user123', 
-                name: 'Regular User',
-                avatar: 'google-user',
-                role: 'user'
-            },
-            'demo@example.com': { 
-                password: 'demo123', 
-                name: 'Demo User',
-                avatar: 'apple-user',
-                role: 'demo'
-            }
-        };
-
-        const user = validUsers[username.toLowerCase()];
-        
-        if (user && user.password === password) {
-            return {
-                success: true,
-                user: {
-                    email: username,
-                    name: user.name,
-                    avatar: user.avatar,
-                    role: user.role,
-                    loginTime: new Date().toISOString(),
-                    sessionId: generateSessionId()
-                }
-            };
-        } else {
-            return {
-                success: false,
-                error: validUsers[username.toLowerCase()] ? 'invalid_credentials' : 'user_not_found'
-            };
-        }
-    };
-
-    const handleAuthError = (errorType) => {
-        switch (errorType) {
-            case 'invalid_credentials':
-                setErrors({
-                    username: 'Invalid credentials',
-                    password: 'Invalid credentials'
-                });
-                showToast('Invalid username or password. Please try again.', 'error');
-                break;
-            case 'user_not_found':
-                setErrors({ username: 'User not found' });
-                showToast('No account found with this username/email.', 'error');
-                break;
-            default:
-                showToast('Login failed. Please check your credentials and try again.', 'error');
-        }
-    };
-
-    const handleSocialLogin = (provider) => {
-        console.log(`${provider} login initiated`);
-        showToast(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login coming soon!`, 'info');
-        
-        if (provider === 'google') {
-            setTimeout(() => {
-                const mockUser = {
-                    email: 'user@gmail.com',
-                    name: 'Google User',
-                    avatar: 'google-user',
-                    role: 'user',
-                    loginTime: new Date().toISOString(),
-                    sessionId: generateSessionId()
-                };
-                setCurrentUser(mockUser);
-            }, 1000);
-        }
-    };
-
-    const handleLogout = () => {
-        setCurrentUser(null);
-        setFormData({ username: '', password: '', rememberMe: false });
-        setErrors({});
-        localStorage.removeItem('userSession');
-        
-        document.body.classList.add('login-mode');
-        document.body.classList.remove('dashboard-mode');
-        
-        showToast('Logged out successfully', 'success');
-    };
-
-    const saveUserSession = (user) => {
-        try {
-            const sessionData = {
-                user: user,
-                timestamp: Date.now(),
-                rememberMe: true,
-                sessionId: user.sessionId
-            };
-            localStorage.setItem('userSession', JSON.stringify(sessionData));
-        } catch (error) {
-            console.error('Failed to save user session:', error);
-        }
-    };
-
-    const checkExistingSession = () => {
-        try {
-            const sessionData = localStorage.getItem('userSession');
-            if (!sessionData) return;
-
-            const session = JSON.parse(sessionData);
-            const oneWeek = 7 * 24 * 60 * 60 * 1000;
-            
-            if (session.rememberMe && session.timestamp && (Date.now() - session.timestamp < oneWeek)) {
-                setCurrentUser(session.user);
-            } else {
-                localStorage.removeItem('userSession');
-            }
-        } catch (error) {
-            console.error('Session validation error:', error);
-            localStorage.removeItem('userSession');
-        }
-    };
-
-    const showToast = (message, type = 'info') => {
-        if (type === 'error') {
-            alert(`❌ ${message}`);
-        } else if (type === 'success') {
-            alert(`✅ ${message}`);
-        } else {
-            alert(`ℹ️ ${message}`);
-        }
-    };
-
-    const generateSessionId = () => {
-        return 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    };
-
-    const getInitials = (name) => {
-        if (!name) return '?';
-        return name.split(' ')
-            .filter(n => n.length > 0)
-            .map(n => n[0])
-            .join('')
-            .toUpperCase()
-            .slice(0, 2);
-    };
-
-    // Dashboard Component
-    const Dashboard = ({ user, onLogout }) => (
-        <div className="dashboard-container">
-            <div className="dashboard-background">
-                <div className="dashboard-content">
-                    <div className="dashboard-header-card">
-                        <div className="dashboard-header">
-                            <div className="user-welcome">
-                                <div className={`user-avatar ${user.avatar}`} data-initials={getInitials(user.name)}></div>
-                                <div className="welcome-text">
-                                    <h1 className="welcome-title">Welcome back, {user.name.split(' ')[0]}!</h1>
-                                    <p className="welcome-subtitle">Ready to explore your dashboard</p>
-                                </div>
-                            </div>
-                            <button className="logout-btn" onClick={onLogout}>
-                                <span>Logout</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="stats-grid">
-                        <div className="stat-card stat-purple">
-                            <div className="stat-content">
-                                <div className="stat-text">
-                                    <div className="stat-label">Total Bookmarks</div>
-                                    <div className="stat-value">1,234</div>
-                                </div>
-                                <div className="stat-icon">👥</div>
-                            </div>
-                        </div>
-                        <div className="stat-card stat-blue">
-                            <div className="stat-content">
-                                <div className="stat-text">
-                                    <div className="stat-label">Active Sessions</div>
-                                    <div className="stat-value">89</div>
-                                </div>
-                                <div className="stat-icon">📊</div>
-                            </div>
-                        </div>
-                        <div className="stat-card stat-green">
-                            <div className="stat-content">
-                                <div className="stat-text">
-                                    <div className="stat-label">Revenue</div>
-                                    <div className="stat-value">$12.4K</div>
-                                </div>
-                                <div className="stat-icon">💰</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="dashboard-grid">
-                        {/* Recent Activity Card */}
-                        <div className="dashboard-card">
-                            <div className="card-header">
-                                <div className="card-icon purple">📈</div>
-                                <div className="card-title-section">
-                                    <h3 className="card-title">Recent Activity</h3>
-                                    <p className="card-subtitle">Latest updates and changes</p>
-                                </div>
-                            </div>
-                            <div className="card-list">
-                                <div className="list-item">
-                                    <div className="list-emoji">✅</div>
-                                    <div className="list-indicator blue"></div>
-                                    <div className="list-content">
-                                        <div className="list-title">Profile Updated</div>
-                                        <div className="list-meta">2 hours ago</div>
-                                    </div>
-                                    <button className="list-action" onClick={() => showToast('View clicked! Feature coming soon.', 'info')}>View</button>
-                                </div>
-                                <div className="list-item">
-                                    <div className="list-emoji">📧</div>
-                                    <div className="list-indicator green"></div>
-                                    <div className="list-content">
-                                        <div className="list-title">Email Sent</div>
-                                        <div className="list-meta">5 hours ago</div>
-                                    </div>
-                                    <button className="list-action" onClick={() => showToast('View clicked! Feature coming soon.', 'info')}>View</button>
-                                </div>
-                                <div className="list-item">
-                                    <div className="list-emoji">🔐</div>
-                                    <div className="list-indicator orange"></div>
-                                    <div className="list-content">
-                                        <div className="list-title">Security Update</div>
-                                        <div className="list-meta">1 day ago</div>
-                                    </div>
-                                    <button className="list-action" onClick={() => showToast('View clicked! Feature coming soon.', 'info')}>View</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Subscription Card */}
-                        <div className="dashboard-card">
-                            <div className="card-header">
-                                <div className="card-icon green">💎</div>
-                                <div className="card-title-section">
-                                    <h3 className="card-title">Subscription</h3>
-                                    <p className="card-subtitle">Manage your plan and billing</p>
-                                </div>
-                            </div>
-                            <div className="subscription-content">
-                                <div className="subscription-info">
-                                    <span className="subscription-badge">Pro Plan</span>
-                                    <span className="subscription-renewal">Renews March 15, 2025</span>
-                                </div>
-                                <button className="subscription-btn" onClick={() => showToast('Manage Subscription clicked! Feature coming soon.', 'info')}>
-                                    <span className="btn-icon">⚡</span>
-                                    <span>Upgrade Plan</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Support Card */}
-                        <div className="dashboard-card">
-                            <div className="card-header">
-                                <div className="card-icon orange">🎧</div>
-                                <div className="card-title-section">
-                                    <h3 className="card-title">Help & Support</h3>
-                                    <p className="card-subtitle">We're here to help</p>
-                                </div>
-                            </div>
-                            <div className="support-content">
-                                <p className="support-text">
-                                    Need help with your account or have questions about Xperio?
-                                </p>
-                                <button className="support-btn" onClick={() => showToast('Contact Support clicked! Feature coming soon.', 'info')}>
-                                    <MdSupport className="btn-icon" />
-                                    <span>Contact Support</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-
-    // Render dashboard if user is logged in
-    if (currentUser) {
-        document.body.classList.add('dashboard-mode');
-        document.body.classList.remove('login-mode');
-        return <Dashboard user={currentUser} onLogout={handleLogout} />;
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
     }
 
-    // Login Form
-    return (
-        <>
-            {/* Background */}
-            <div className="login-background"></div>
-            
-            {/* Main wrapper */}
-            <div className={`login-page-wrapper ${Object.keys(errors).length > 0 ? 'has-errors' : ''}`}>
-                <div className={`login-content-container ${Object.keys(errors).length > 0 ? 'has-errors' : ''}`}>
-                    <motion.div
-                        className={`login-form-wrapper ${Object.keys(errors).length > 0 ? 'has-errors' : ''}`}
-                        initial={{ opacity: 0, y: 40 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.7, ease: 'easeOut' }}
-                    >
-                        {/* Brand Header */}
-                        <div className="login-brand-header">
-                            <div className={`brand-icon-container ${Object.keys(errors).length > 0 ? 'has-errors' : ''}`}>
-                                <FaGlobe className="brand-icon globe" />
-                                <HiSparkles className="brand-icon sparkles" />
-                            </div>
-                            <h1 className={`brand-title ${Object.keys(errors).length > 0 ? 'has-errors' : ''}`}>
-                                Welcome to Xperio
-                            </h1>
-                            <p className={`brand-subtitle ${Object.keys(errors).length > 0 ? 'has-errors' : ''}`}>
-                                Sign in to explore cultures worldwide
-                            </p>
-                        </div>
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    }
 
-                        {/* Form Container */}
-                        <form onSubmit={handleLogin} className="login-form-container">
-                            {/* Input Fields Section */}
-                            <div className="input-fields-section">
-                                {/* Username Field */}
-                                <div className="form-field">
-                                    <label className={`field-label ${errors.username ? 'error' : ''}`}>
-                                        <MdEmail className="label-icon" />
-                                        Username or Email
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="username"
-                                        className={`form-input ${errors.username ? 'error' : ''}`}
-                                        value={formData.username}
-                                        onChange={handleInputChange}
-                                        placeholder="Enter your username or email"
-                                        autoComplete="username"
-                                    />
-                                </div>
+    if (!isLogin) {
+      if (!formData.name) {
+        newErrors.name = 'Name is required';
+      }
+      if (formData.password !== formData.confirmPassword) {
+        newErrors.confirmPassword = 'Passwords do not match';
+      }
+    }
 
-                                {/* Password Field */}
-                                <div className="form-field">
-                                    <label className={`field-label ${errors.password ? 'error' : ''}`}>
-                                        <MdLock className="label-icon" />
-                                        Password
-                                    </label>
-                                    <div className="password-container">
-                                        <input
-                                            type={showPassword ? 'text' : 'password'}
-                                            name="password"
-                                            className={`form-input ${errors.password ? 'error' : ''}`}
-                                            value={formData.password}
-                                            onChange={handleInputChange}
-                                            placeholder="Enter your password"
-                                            autoComplete="current-password"
-                                        />
-                                        <button
-                                            type="button"
-                                            className={`password-toggle-btn ${errors.password ? 'error' : ''}`}
-                                            onClick={() => setShowPassword(!showPassword)}
-                                        >
-                                            {showPassword ? '👁️' : '🙈'}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-                            {/* Form Options */}
-                            <div className="form-options-section">
-                                <label className="remember-me-checkbox">
-                                    <input
-                                        type="checkbox"
-                                        name="rememberMe"
-                                        checked={formData.rememberMe}
-                                        onChange={handleInputChange}
-                                    />
-                                    <div className="custom-checkbox"></div>
-                                    Remember me
-                                </label>
-                                <a href="#" className="forgot-password-link" onClick={(e) => {
-                                    e.preventDefault();
-                                    showToast('Password reset coming soon!', 'info');
-                                }}>
-                                    Forgot password?
-                                </a>
-                            </div>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
 
-                            {/* Login Button */}
-                            <button 
-                                type="submit" 
-                                className={`primary-login-btn ${Object.keys(errors).length > 0 ? 'error-state' : ''}`}
-                                disabled={isLoading}
-                            >
-                                {isLoading ? (
-                                    <div className="loading-content">
-                                        <div className="loading-spinner"></div>
-                                        <span>Signing in...</span>
-                                    </div>
-                                ) : (
-                                    'Sign In'
-                                )}
-                            </button>
+    setIsLoading(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsLoading(false);
+      navigate('/');
+    }, 2000);
+  };
 
-                            {/* Divider */}
-                            <div className="divider-section">
-                                <div className="divider-line"></div>
-                                <span className="divider-text">or</span>
-                                <div className="divider-line"></div>
-                            </div>
+  const socialLogins = [
+    { name: 'Google', icon: <Google className="social-icon" />, color: 'from-red-500 to-orange-500' },
+    { name: 'Facebook', icon: <Facebook className="social-icon" />, color: 'from-blue-600 to-blue-700' },
+    { name: 'Twitter', icon: <Twitter className="social-icon" />, color: 'from-blue-400 to-blue-500' }
+  ];
 
-                            {/* Social Login */}
-                            <div className="social-login-section">
-                                <button
-                                    type="button"
-                                    className="social-login-btn google-btn"
-                                    onClick={() => handleSocialLogin('google')}
-                                >
-                                    <FaGoogle className="social-icon" />
-                                    Google
-                                </button>
-                                <button
-                                    type="button"
-                                    className="social-login-btn apple-btn"
-                                    onClick={() => handleSocialLogin('apple')}
-                                >
-                                    <FaApple className="social-icon" />
-                                    Apple
-                                </button>
-                            </div>
+  return (
+    <div className="login-page">
+      <div className="login-background">
+        <div className="login-bg-image" style={{
+          backgroundImage: 'url(https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=2400&q=80)'
+        }} />
+        <div className="login-overlay" />
+        <div className="login-particles" />
+      </div>
 
-                            {/* Footer */}
-                            <div className="login-footer-section">
-                                <p className="footer-text">
-                                    Don't have an account?
-                                    <button 
-                                        type="button"
-                                        className="signup-link-btn"
-                                        onClick={() => showToast('Signup page coming soon!', 'info')}
-                                    >
-                                        Sign up here
-                                    </button>
-                                </p>
-                            </div>
-                        </form>
-                    </motion.div>
-                </div>
+      <div className="login-container">
+        <div className="login-content">
+          {/* Left Side - Branding */}
+          <motion.div
+            className="login-branding"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <div className="brand-logo">
+              <div className="logo-icon">
+                <Plane className="logo-plane" />
+              </div>
+              <h1 className="brand-title">Xperio</h1>
             </div>
-        </>
-    );
+            
+            <h2 className="brand-headline">
+              Discover the World with AI-Powered Travel
+            </h2>
+            
+            <p className="brand-description">
+              Join over 250,000 travelers who trust Xperio to unlock authentic experiences, 
+              discover hidden gems, and create unforgettable memories.
+            </p>
+
+            <div className="brand-features">
+              <div className="feature-item">
+                <CheckCircle className="feature-icon" />
+                <span>AI-Powered Recommendations</span>
+              </div>
+              <div className="feature-item">
+                <CheckCircle className="feature-icon" />
+                <span>Real-time Translation</span>
+              </div>
+              <div className="feature-item">
+                <CheckCircle className="feature-icon" />
+                <span>Cultural Insights</span>
+              </div>
+              <div className="feature-item">
+                <CheckCircle className="feature-icon" />
+                <span>Local Food Discovery</span>
+              </div>
+            </div>
+
+            <div className="brand-testimonial">
+              <div className="testimonial-stars">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="star-filled" />
+                ))}
+              </div>
+              <p>"Xperio completely transformed my travel experience!"</p>
+              <span>- Sarah Chen, Digital Nomad</span>
+            </div>
+          </motion.div>
+
+          {/* Right Side - Form */}
+          <motion.div
+            className="login-form-container"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <div className="form-wrapper">
+              <div className="form-header">
+                <h3 className="form-title">
+                  {isLogin ? 'Welcome Back' : 'Create Account'}
+                </h3>
+                <p className="form-subtitle">
+                  {isLogin 
+                    ? 'Sign in to continue your travel journey' 
+                    : 'Start your adventure with Xperio today'
+                  }
+                </p>
+              </div>
+
+              {/* Social Loginpage Buttons */}
+              <div className="social-login">
+                {socialLogins.map((social, index) => (
+                  <motion.button
+                    key={social.name}
+                    className={`social-btn bg-gradient-to-r ${social.color}`}
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {social.icon}
+                    <span>{isLogin ? 'Sign in' : 'Sign up'} with {social.name}</span>
+                  </motion.button>
+                ))}
+              </div>
+
+              <div className="divider">
+                <span>or</span>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="login-form">
+                <AnimatePresence mode="wait">
+                  {!isLogin && (
+                    <motion.div
+                      className="input-group"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="input-wrapper">
+                        <User className="input-icon" />
+                        <input
+                          type="text"
+                          name="name"
+                          placeholder="Full Name"
+                          value={formData.name}
+                          onChange={handleInputChange}
+                          className={`form-input ${errors.name ? 'error' : ''}`}
+                        />
+                      </div>
+                      {errors.name && (
+                        <div className="error-message">
+                          <AlertCircle className="error-icon" />
+                          <span>{errors.name}</span>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <div className="input-group">
+                  <div className="input-wrapper">
+                    <Mail className="input-icon" />
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Email Address"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className={`form-input ${errors.email ? 'error' : ''}`}
+                    />
+                  </div>
+                  {errors.email && (
+                    <div className="error-message">
+                      <AlertCircle className="error-icon" />
+                      <span>{errors.email}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="input-group">
+                  <div className="input-wrapper">
+                    <Lock className="input-icon" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      name="password"
+                      placeholder="Password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      className={`form-input ${errors.password ? 'error' : ''}`}
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className="toggle-icon" /> : <Eye className="toggle-icon" />}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <div className="error-message">
+                      <AlertCircle className="error-icon" />
+                      <span>{errors.password}</span>
+                    </div>
+                  )}
+                </div>
+
+                <AnimatePresence mode="wait">
+                  {!isLogin && (
+                    <motion.div
+                      className="input-group"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="input-wrapper">
+                        <Lock className="input-icon" />
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          name="confirmPassword"
+                          placeholder="Confirm Password"
+                          value={formData.confirmPassword}
+                          onChange={handleInputChange}
+                          className={`form-input ${errors.confirmPassword ? 'error' : ''}`}
+                        />
+                      </div>
+                      {errors.confirmPassword && (
+                        <div className="error-message">
+                          <AlertCircle className="error-icon" />
+                          <span>{errors.confirmPassword}</span>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {isLogin && (
+                  <div className="form-options">
+                    <label className="checkbox-wrapper">
+                      <input type="checkbox" />
+                      <span className="checkmark"></span>
+                      Remember me
+                    </label>
+                    <button type="button" className="forgot-password">
+                      Forgot Password?
+                    </button>
+                  </div>
+                )}
+
+                <motion.button
+                  type="submit"
+                  className="submit-btn"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="loading-spinner" />
+                  ) : (
+                    <>
+                      <span>{isLogin ? 'Sign In' : 'Create Account'}</span>
+                      <ArrowRight className="submit-icon" />
+                    </>
+                  )}
+                </motion.button>
+
+                <div className="form-switch">
+                  <span>
+                    {isLogin ? "Don't have an account?" : "Already have an account?"}
+                  </span>
+                  <button
+                    type="button"
+                    className="switch-btn"
+                    onClick={() => setIsLogin(!isLogin)}
+                  >
+                    {isLogin ? 'Sign Up' : 'Sign In'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-export default LoginPage;
+export default Loginpage;

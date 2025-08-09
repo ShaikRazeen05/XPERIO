@@ -1,502 +1,809 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Globe, Star, MapPin, Play, Users, TrendingUp, ArrowRight, Heart, Crown, Plane,
+  Zap, Award, Camera, MessageCircle, Search, Bell, User, Menu, X, ChevronDown,
+  Utensils, Palette, Languages, Sparkles, Bot, SendHorizontal, Phone
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Globe, Star, MapPin, Play, Users, TrendingUp, ArrowRight, Heart, Crown } from 'lucide-react';
-import Navbar from './Navbar';
+import ProfessionalNavbar from './ProfessionalNavbar';
+import AdvancedChatbot from './AdvancedChatbot';
 import Footer from './Footer';
+import './homepage.css';
 
 export function Homepage() {
-    const items = [
-        { label: "Food", url: "/Food" },
-        { label: "Culture", url: "/Culture" },
-        { label: "Translator", url: "/Translator" },
-        { label: "Premium", url: "/Premium" }
-    ];
     const navigate = useNavigate();
-    const [isLoaded, setIsLoaded] = useState(false);
+    const [currentTestimonial, setCurrentTestimonial] = useState(0);
+    const [statsVisible, setStatsVisible] = useState(false);
+    const [activeFeature, setActiveFeature] = useState(0);
+    const [chatbotOpen, setChatbotOpen] = useState(false);
 
-    useEffect(() => {
-        setIsLoaded(true);
-    }, []);
-
-    // Navigation handler
     const handleNavigation = (url) => {
         navigate(url);
     };
-    
+
+    // Counter animation hook
+    const useCountUp = (end, duration = 2000) => {
+        const [count, setCount] = useState(0);
+        
+        useEffect(() => {
+            if (!statsVisible) return;
+            
+            let startTime;
+            const animate = (currentTime) => {
+                if (!startTime) startTime = currentTime;
+                const progress = Math.min((currentTime - startTime) / duration, 1);
+                setCount(Math.floor(progress * end));
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                }
+            };
+            
+            requestAnimationFrame(animate);
+        }, [end, duration, statsVisible]);
+        
+        return count;
+    };
+
+    const userCount = useCountUp(250000);
+    const cityCount = useCountUp(500);
+    const reviewCount = useCountUp(50000);
+
+    // Enhanced testimonials with premium profile images[2]
     const testimonials = [
         {
-            name: "Ananya Sharma",
-            message: "Xperio made my trip unforgettable! I experienced festivals like a true local.",
-            role: "Travel Blogger",
-            rating: 5
+            name: "Sarah Chen",
+            message: "Xperio transformed my solo travel experience in Southeast Asia. The AI recommendations were absolutely perfect!",
+            role: "Digital Nomad",
+            rating: 5,
+            avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b977?auto=format&fit=crop&w=150&q=80",
+            location: "Bangkok, Thailand",
+            date: "2 days ago"
         },
         {
-            name: "Rahul Mehra",
-            message: "The cultural insights and easy translations helped me navigate new cities with confidence.",
+            name: "Marcus Rodriguez",
+            role: "Food Blogger",
+            avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80",
+            message: "Found the most incredible street food spots I never would have discovered. This app is a game-changer!",
+            rating: 5,
+            location: "Mumbai, India",
+            date: "5 days ago"
+        },
+        {
+            name: "Emily Johnson",
+            role: "Travel Photographer",
+            avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150&q=80",
+            message: "The cultural insights helped me capture authentic moments that tell real stories. Absolutely brilliant!",
+            rating: 5,
+            location: "Kyoto, Japan",
+            date: "1 week ago"
+        },
+        {
+            name: "Ahmed Hassan",
             role: "Business Traveler",
-            rating: 5
-        },
-        {
-            name: "Lara Thomas",
-            message: "Loved discovering hidden street food gems. Highly recommended!",
-            role: "Food Enthusiast",
-            rating: 5
-        },
-        {
-            name: "Rai M.",
-            message: "Xperio made my trip to Hyderabad unforgettable. I discovered hidden food spots that even locals didn't know about. The translator feature was a life-saver!",
-            role: "Founder of ArtisanMarket",
-            rating: 5
-        },
-        {
-            name: "Mike P.",
-            message: "I never thought a web app could make exploring my own city so exciting. Xperio's cultural insights and clean interface are game changers.",
-            role: "GreenFuture Foundation",
-            rating: 5
-        },
-        {
-            name: "Sadiya",
-            message: "From street food recommendations to immersive cultural clips, Xperio nails it. The premium content is worth every rupee!",
-            role: "Employee NovaTech",
-            rating: 5
-        },
-        {
-            name: "Sara L.",
-            message: "The app's cultural modules are stunning. I learned about local traditions before even arriving. It made my experience richer.",
-            role: "Influencer",
-            rating: 5
-        },
-        {
-            name: "Jack",
-            message: "The live translator helped me interact with vendors during my trip. That feature alone makes Xperio a must-have!",
-            role: "Teacher",
-            rating: 5
-        },
-        {
-            name: "Raj.",
-            message: "The Xperio dashboard felt like my personal travel assistant. I found local mosques, food stalls, and historical sites in seconds.",
-            role: "Travel influencer",
-            rating: 5
+            avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
+            message: "The AI translator saved my business meetings in Shanghai. Accurate translations in real-time!",
+            rating: 5,
+            location: "Shanghai, China",
+            date: "3 days ago"
         }
     ];
 
+    // Enhanced feature grid with premium travel images[2][22][25]
+    const features = [
+        {
+            id: 'food',
+            title: 'Food Discovery',
+            icon: <Utensils className="feature-icon-main" />,
+            description: 'Discover authentic local cuisine with AI-powered recommendations from hidden gems to street food delights',
+            image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?auto=format&fit=crop&w=800&q=80",
+            gradient: 'from-orange-500 to-red-500',
+            delay: 0.1
+        },
+        {
+            id: 'culture',
+            title: 'Cultural Experiences',
+            icon: <Palette className="feature-icon-main" />,
+            description: 'Immerse in local traditions, festivals, and cultural events with expert guidance and insights',
+            image: "https://images.unsplash.com/photo-1494791368093-85217fbbf8de?auto=format&fit=crop&w=800&q=80",
+            gradient: 'from-purple-500 to-pink-500',
+            delay: 0.2
+        },
+        {
+            id: 'translator',
+            title: 'AI Translator',
+            icon: <Languages className="feature-icon-main" />,
+            description: 'Break language barriers with real-time AI translation in 100+ languages worldwide',
+            image: "https://images.unsplash.com/photo-1516321165247-4aa89a48be28?auto=format&fit=crop&w=800&q=80",
+            gradient: 'from-blue-500 to-cyan-500',
+            delay: 0.3
+        },
+        {
+            id: 'premium',
+            title: 'Premium Features',
+            icon: <Crown className="feature-icon-main" />,
+            description: 'Unlock exclusive features, offline access, and premium travel experiences worldwide',
+            image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80",
+            gradient: 'from-yellow-500 to-orange-500',
+            delay: 0.4
+        }
+    ];
+
+    // Auto-rotate testimonials
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentTestimonial((prev) => (prev + 2) % testimonials.length);
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
+    // Floating animation variants
+    const floatingVariants = {
+        animate: {
+            y: [0, -20, 0],
+            transition: {
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+            }
+        }
+    };
+
+    const staggerContainer = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const staggerItem = {
+        hidden: { opacity: 0, y: 50 },
+        show: { 
+            opacity: 1, 
+            y: 0,
+            transition: {
+                duration: 0.6,
+                ease: "easeOut"
+            }
+        }
+    };
+
+    // Enhanced Chatbot Component
+    const ChatbotWidget = () => (
+        <motion.div 
+            className="chatbot-widget"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3 }}
+        >
+            <AnimatePresence>
+                {chatbotOpen && (
+                    <motion.div
+                        className="chatbot-window"
+                        initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 50, scale: 0.9 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <div className="chatbot-header">
+                            <div className="chatbot-info">
+                                <div className="bot-avatar">
+                                    <Bot className="bot-icon" />
+                                    <div className="status-indicator"></div>
+                                </div>
+                                <div>
+                                    <h4>Xperio Assistant</h4>
+                                    <p>Online • Ready to help</p>
+                                </div>
+                            </div>
+                            <button 
+                                className="close-chatbot"
+                                onClick={() => setChatbotOpen(false)}
+                            >
+                                <X className="close-icon" />
+                            </button>
+                        </div>
+
+                        <div className="chatbot-messages">
+                            <motion.div 
+                                className="message bot-message"
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.2 }}
+                            >
+                                <div className="message-avatar">
+                                    <Bot className="avatar-icon" />
+                                </div>
+                                <div className="message-content">
+                                    <p>Hi! I'm your Xperio travel assistant. How can I help you explore the world today?</p>
+                                    <div className="quick-actions">
+                                        <button className="quick-btn" onClick={() => handleNavigation('/food')}>
+                                            🍽️ Find Food
+                                        </button>
+                                        <button className="quick-btn" onClick={() => handleNavigation('/culture')}>
+                                            🎭 Explore Culture
+                                        </button>
+                                        <button className="quick-btn" onClick={() => handleNavigation('/translator')}>
+                                            🌐 Translate
+                                        </button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </div>
+
+                        <div className="chatbot-input">
+                            <input 
+                                type="text" 
+                                placeholder="Type your message..."
+                                className="chat-input-field"
+                            />
+                            <button className="send-btn">
+                                <SendHorizontal className="send-icon" />
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <motion.button
+                className="chatbot-trigger"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setChatbotOpen(!chatbotOpen)}
+                animate={{ 
+                    y: [0, -10, 0],
+                    transition: { duration: 2, repeat: Infinity }
+                }}
+            >
+                <Bot className="chatbot-icon" />
+                <motion.div 
+                    className="notification-badge"
+                    animate={{ 
+                        scale: [1, 1.2, 1],
+                        transition: { duration: 2, repeat: Infinity }
+                    }}
+                >
+                    1
+                </motion.div>
+                <div className="pulse-ring"></div>
+            </motion.button>
+        </motion.div>
+    );
+
     return (
         <>
-            <Navbar />
-            {/* Hero Section */}
-            <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50">
-                <div className="max-w-7xl mx-auto px-6 py-20">
-                    <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
-                        {/* Left: Text Content */}
-                        <motion.div 
-                            className="flex-1 max-w-2xl"
-                            initial={{ opacity: 0, x: -50 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.8, delay: 0.2 }}
-                        >
-                            {/* Small Badge */}
+            <ProfessionalNavbar />
+            
+            <div className="homepage-container">
+                {/* Enhanced Hero Section with Premium Travel Background[25] */}
+                <section className="hero-section">
+                    <div className="hero-background">
+                        <div className="hero-image" style={{
+                            backgroundImage: 'url(https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2400&q=80)'
+                        }} />
+                        <div className="hero-overlay"></div>
+                        <div className="hero-particles"></div>
+                        <div className="floating-elements">
+                            <motion.div className="floating-orb orb-1" variants={floatingVariants} animate="animate" />
+                            <motion.div className="floating-orb orb-2" variants={floatingVariants} animate="animate" />
+                            <motion.div className="floating-orb orb-3" variants={floatingVariants} animate="animate" />
+                        </div>
+                    </div>
+
+                    <div className="hero-content">
+                        <div className="hero-container">
                             <motion.div 
-                                className="flex items-center mb-8"
-                                initial={{ opacity: 0, y: 20 }}
+                                className="hero-text"
+                                initial={{ opacity: 0, y: 50 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.6, delay: 0.4 }}
+                                transition={{ duration: 0.8, delay: 0.2 }}
                             >
-                                <span className="inline-flex items-center bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-full font-bold text-lg gap-3 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group">
-                                    <Globe className="w-6 h-6 group-hover:rotate-12 transition-transform" />
-                                    Discover Local Food Culture
-                                </span>
-                            </motion.div>
-                            
-                            <motion.h1 
-                                className="text-6xl lg:text-7xl xl:text-8xl font-display font-black leading-tight mb-8 text-gray-900"
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.8, delay: 0.6 }}
-                            >
-                                Taste the{' '}
-                                <span className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 bg-clip-text text-transparent hover:scale-105 transition-transform duration-300">
-                                    World
-                                </span>{' '}
-                                Like a{' '}
-                                <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent hover:scale-105 transition-transform duration-300">
-                                    Local
-                                </span>
-                            </motion.h1>
-                            
-                            <motion.p 
-                                className="text-xl lg:text-2xl text-gray-700 mb-12 leading-relaxed font-body"
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.8, delay: 0.8 }}
-                            >
-                                Discover authentic street food, cultural experiences, and hidden gems in any city. Your complete companion for culinary adventures.
-                            </motion.p>
-                            
-                            <motion.div 
-                                className="flex flex-col sm:flex-row gap-6 mb-12"
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.8, delay: 1.0 }}
-                            >
-                                <motion.button 
-                                    className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-2xl font-bold text-xl shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center gap-3 group"
-                                    whileHover={{ scale: 1.05, y: -3 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => handleNavigation('/Food')}
+                                <motion.div 
+                                    className="hero-badge"
+                                    initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    transition={{ duration: 0.6, delay: 0.4 }}
+                                    whileHover={{ scale: 1.05 }}
                                 >
-                                    Start Exploring
-                                    <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                                </motion.button>
+                                    <Globe className="badge-icon" />
+                                    <span>Powered by Advanced AI</span>
+                                    <motion.div 
+                                        className="badge-sparkle"
+                                        animate={{ rotate: [0, 360] }}
+                                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                    >
+                                        ✨
+                                    </motion.div>
+                                </motion.div>
                                 
-                                <motion.button 
-                                    className="bg-white text-gray-800 px-8 py-4 rounded-2xl font-bold text-xl border-2 border-gray-300 hover:border-gray-400 transition-all duration-300 flex items-center justify-center gap-3 group shadow-lg hover:shadow-xl"
-                                    whileHover={{ scale: 1.05, y: -3 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => handleNavigation('/Premium')}
+                                <motion.h1 
+                                    className="hero-title"
+                                    initial={{ opacity: 0, y: 30 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.8, delay: 0.6 }}
                                 >
-                                    <Play className="w-6 h-6" />
-                                    Watch Demo
-                                </motion.button>
+                                    Discover the World
+                                    <motion.span 
+                                        className="title-gradient"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ duration: 1, delay: 1.2 }}
+                                    >
+                                        Like Never Before
+                                    </motion.span>
+                                </motion.h1>
+                                
+                                <motion.p 
+                                    className="hero-subtitle"
+                                    initial={{ opacity: 0, y: 30 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.8, delay: 0.8 }}
+                                >
+                                    Experience authentic travel with AI-powered recommendations, real-time translation, 
+                                    and insider knowledge from local experts across 500+ destinations worldwide.
+                                </motion.p>
+                                
+                                <motion.div 
+                                    className="hero-actions"
+                                    initial={{ opacity: 0, y: 30 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.8, delay: 1.0 }}
+                                >
+                                    <motion.button 
+                                        className="cta-primary"
+                                        whileHover={{ 
+                                            scale: 1.05, 
+                                            y: -3,
+                                            boxShadow: "0 20px 40px rgba(102, 126, 234, 0.6)"
+                                        }}
+                                        whileTap={{ scale: 0.98 }}
+                                        onClick={() => handleNavigation('/food')}
+                                    >
+                                        <span>Start Your Journey</span>
+                                        <motion.div
+                                            animate={{ x: [0, 5, 0] }}
+                                            transition={{ duration: 1.5, repeat: Infinity }}
+                                        >
+                                            <ArrowRight className="cta-icon" />
+                                        </motion.div>
+                                    </motion.button>
+                                    
+                                    <motion.button 
+                                        className="cta-secondary"
+                                        whileHover={{ 
+                                            scale: 1.05, 
+                                            y: -3,
+                                            backgroundColor: "rgba(255, 255, 255, 0.2)"
+                                        }}
+                                        whileTap={{ scale: 0.98 }}
+                                        onClick={() => handleNavigation('/premium')}
+                                    >
+                                        <Play className="cta-icon" />
+                                        <span>Watch Demo</span>
+                                    </motion.button>
+                                </motion.div>
                             </motion.div>
                             
                             <motion.div 
-                                className="flex flex-col sm:flex-row items-center gap-8 text-lg text-gray-600"
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.8, delay: 1.2 }}
+                                className="hero-visual"
+                                initial={{ opacity: 0, x: 50 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.8, delay: 0.4 }}
                             >
-                                <span className="flex items-center gap-3 hover:scale-105 transition-transform cursor-pointer">
-                                    <MapPin className="w-6 h-6 text-orange-500" />
-                                    Available in 200+ cities
-                                </span>
-                                <span className="flex items-center gap-3 hover:scale-105 transition-transform cursor-pointer">
-                                    <Star className="w-6 h-6 text-yellow-500 fill-current" />
-                                    4.9/5 (10k+ reviews)
-                                </span>
+                                <motion.div 
+                                    className="hero-device"
+                                    whileHover={{ 
+                                        rotateY: 15,
+                                        scale: 1.05,
+                                        transition: { duration: 0.3 }
+                                    }}
+                                    animate={{
+                                        y: [0, -10, 0],
+                                        transition: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+                                    }}
+                                >
+                                    <div 
+                                        className="device-screen"
+                                        style={{
+                                            backgroundImage: 'url(https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=400&q=80)'
+                                        }}
+                                    />
+                                    <div className="device-frame"></div>
+                                    <div className="device-glow"></div>
+                                </motion.div>
                             </motion.div>
-                        </motion.div>
-                        
-                        {/* Right: Travel Image Container */}
-                        <motion.div 
-                            className="flex-1 flex justify-center"
-                            initial={{ opacity: 0, x: 50 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.8, delay: 0.4 }}
+                        </div>
+                    </div>
+                </section>
+
+                {/* Enhanced Features Grid Section with Curated Images[44][45][46] */}
+                <section className="features-grid-section">
+                    <div className="features-container">
+                        <motion.div
+                            className="section-header"
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8 }}
                         >
-                            <div className="relative w-96 h-96 lg:w-[500px] lg:h-[500px] rounded-3xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 group">
-                                <img 
-                                    src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80" 
-                                    alt="World Travel and Exploration" 
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
-                            </div>
+                            <motion.div 
+                                className="section-badge"
+                                whileHover={{ scale: 1.1 }}
+                            >
+                                <Sparkles className="badge-icon" />
+                                <span>Explore Features</span>
+                            </motion.div>
+                            <h2 className="section-title">Everything You Need for Perfect Travel</h2>
+                            <p className="section-subtitle">
+                                Four powerful modules designed to transform your travel experience
+                            </p>
+                        </motion.div>
+
+                        <motion.div 
+                            className="features-grid-2x2"
+                            variants={staggerContainer}
+                            initial="hidden"
+                            whileInView="show"
+                            viewport={{ once: true }}
+                        >
+                            {features.map((feature, index) => (
+                                <motion.div
+                                    key={feature.id}
+                                    className={`feature-card-main bg-gradient-to-br ${feature.gradient}`}
+                                    variants={staggerItem}
+                                    whileHover={{ 
+                                        y: -15, 
+                                        scale: 1.02,
+                                        rotateY: 5,
+                                        transition: { duration: 0.3 }
+                                    }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={() => handleNavigation(`/${feature.id}`)}
+                                    onHoverStart={() => setActiveFeature(index)}
+                                >
+                                    <div className="feature-image-main">
+                                        <motion.img 
+                                            src={feature.image} 
+                                            alt={feature.title}
+                                            whileHover={{ scale: 1.1 }}
+                                            transition={{ duration: 0.4 }}
+                                        />
+                                        <div className="feature-overlay-main"></div>
+                                        <motion.div 
+                                            className="feature-icon-wrapper"
+                                            whileHover={{ 
+                                                scale: 1.2,
+                                                rotate: 360,
+                                                transition: { duration: 0.6 }
+                                            }}
+                                        >
+                                            {feature.icon}
+                                        </motion.div>
+                                        <motion.div
+                                            className="feature-shine"
+                                            initial={{ x: -100, opacity: 0 }}
+                                            whileHover={{ 
+                                                x: 300, 
+                                                opacity: [0, 1, 0],
+                                                transition: { duration: 0.6 }
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="feature-content-main">
+                                        <h3 className="feature-title-main">{feature.title}</h3>
+                                        <p className="feature-description-main">{feature.description}</p>
+                                        <motion.div
+                                            className="feature-arrow"
+                                            whileHover={{ x: 10 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <ArrowRight className="arrow-icon" />
+                                        </motion.div>
+                                    </div>
+                                </motion.div>
+                            ))}
                         </motion.div>
                     </div>
-                </div>
-            </div>
-            
-            {/* Your Complete Travel Companion Section */}
-            <div className="bg-white py-20">
-                <div className="max-w-7xl mx-auto px-6">
-                    {/* Section Header */}
-                    <motion.div 
-                        className="text-center mb-20"
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8 }}
-                    >
-                        <motion.button 
-                            className="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 border-2 border-gray-300 rounded-full px-6 py-3 text-lg font-semibold mb-8 hover:shadow-lg transition-all duration-300"
-                            whileHover={{ scale: 1.05, y: -2 }}
-                        >
-                            Explore All Modules
-                        </motion.button>
-                        
-                        <h2 className="text-5xl lg:text-6xl font-display font-black text-gray-900 mb-6 leading-tight">
-                            Your Complete Travel Companion
-                        </h2>
-                        
-                        <p className="text-xl lg:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed font-body">
-                            Four powerful modules designed to enhance every aspect of your cultural food journey
-                        </p>
-                    </motion.div>
-                    
-                    {/* Module Cards */}
-                    <motion.div 
-                        className="grid grid-cols-1 lg:grid-cols-2 gap-8"
-                        initial={{ opacity: 0, y: 50 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                    >
-                        {/* Card 1: Xperio Food */}
-                        <motion.div 
-                            className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 hover:shadow-3xl transition-all duration-500 group"
-                            whileHover={{ scale: 1.02, y: -10 }}
-                        >
-                            {/* Image */}
-                            <div className="relative h-64 overflow-hidden">
-                                <img 
-                                    src="/pictures_homepage/biryani.jpg" 
-                                    alt="Delicious biryani and local cuisine" 
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                />
-                                {/* Icon Overlay */}
-                                <div className="absolute top-6 left-6 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-4 shadow-xl group-hover:scale-110 transition-transform duration-300">
-                                    <MapPin className="w-6 h-6 text-white" />
-                                </div>
-                            </div>
-                            
-                            {/* Content */}
-                            <div className="p-8">
-                                <h3 className="text-3xl font-display font-bold text-gray-900 mb-4">
-                                    Xperio Food
-                                </h3>
-                                <p className="text-lg text-gray-600 mb-6 leading-relaxed font-body">
-                                    Discover the best street food and restaurants with interactive maps, reviews, and directions.
-                                </p>
-                                
-                                {/* Feature Tags */}
-                                <div className="flex flex-wrap gap-3 mb-6">
-                                    {['Interactive Maps', 'User Reviews', 'Photo Uploads'].map((tag, index) => (
-                                        <span key={tag} className="bg-gradient-to-r from-orange-100 to-red-100 text-orange-800 px-4 py-2 rounded-full font-semibold text-sm hover:scale-105 transition-transform cursor-pointer">
-                                            {tag}
-                                        </span>
-                                    ))}
-                                </div>
-                                
-                                {/* Action Button */}
-                                <motion.button 
-                                    className="w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 group"
-                                    whileHover={{ scale: 1.02, y: -2 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    onClick={() => handleNavigation('/Food')}
-                                >
-                                    Explore Xperio Food
-                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                </motion.button>
-                            </div>
-                        </motion.div>
-                        
-                        {/* Card 2: Xperio Culture */}
-                        <motion.div 
-                            className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 hover:shadow-3xl transition-all duration-500 group"
-                            whileHover={{ scale: 1.02, y: -10 }}
-                        >
-                            {/* Image */}
-                            <div className="relative h-64 overflow-hidden">
-                                <img 
-                                    src="/pictures_homepage/culture.png" 
-                                    alt="Cultural landmarks and traditional culture" 
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                />
-                                {/* Icon Overlay */}
-                                <div className="absolute top-6 left-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-4 shadow-xl group-hover:scale-110 transition-transform duration-300">
-                                    <Heart className="w-6 h-6 text-white" />
-                                </div>
-                            </div>
-                            
-                            {/* Content */}
-                            <div className="p-8">
-                                <h3 className="text-3xl font-display font-bold text-gray-900 mb-4">
-                                    Xperio Culture
-                                </h3>
-                                <p className="text-lg text-gray-600 mb-6 leading-relaxed font-body">
-                                    Explore local places, cultural events, and historical landmarks with expert travel tips.
-                                </p>
-                                
-                                {/* Feature Tags */}
-                                <div className="flex flex-wrap gap-3 mb-6">
-                                    {['Cultural Events', 'Historical Sites', 'Travel Tips'].map((tag, index) => (
-                                        <span key={tag} className="bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 px-4 py-2 rounded-full font-semibold text-sm hover:scale-105 transition-transform cursor-pointer">
-                                            {tag}
-                                        </span>
-                                    ))}
-                                </div>
-                                
-                                {/* Action Button */}
-                                <motion.button 
-                                    className="w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 group"
-                                    whileHover={{ scale: 1.02, y: -2 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    onClick={() => handleNavigation('/Culture')}
-                                >
-                                    Explore Xperio Culture
-                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                </motion.button>
-                            </div>
-                        </motion.div>
-                        
-                        {/* Card 3: Xperio Translator */}
-                        <motion.div 
-                            className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 hover:shadow-3xl transition-all duration-500 group"
-                            whileHover={{ scale: 1.02, y: -10 }}
-                        >
-                            {/* Image */}
-                            <div className="relative h-64 overflow-hidden">
-                                <img 
-                                    src="/pictures_homepage/translator.jpg" 
-                                    alt="AI translation and language technology" 
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                />
-                                {/* Icon Overlay */}
-                                <div className="absolute top-6 left-6 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl p-4 shadow-xl group-hover:scale-110 transition-transform duration-300">
-                                    <Globe className="w-6 h-6 text-white" />
-                                </div>
-                            </div>
-                            
-                            {/* Content */}
-                            <div className="p-8">
-                                <h3 className="text-3xl font-display font-bold text-gray-900 mb-4">
-                                    Xperio Translator
-                                </h3>
-                                <p className="text-lg text-gray-600 mb-6 leading-relaxed font-body">
-                                    AI-powered translation for text, speech, and menus to break language barriers.
-                                </p>
-                                
-                                {/* Feature Tags */}
-                                <div className="flex flex-wrap gap-3 mb-6">
-                                    {['Text Translation', 'Speech-to-Text', 'Menu Scanner'].map((tag, index) => (
-                                        <span key={tag} className="bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 px-4 py-2 rounded-full font-semibold text-sm hover:scale-105 transition-transform cursor-pointer">
-                                            {tag}
-                                        </span>
-                                    ))}
-                                </div>
-                                
-                                {/* Action Button */}
-                                <motion.button 
-                                    className="w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 group"
-                                    whileHover={{ scale: 1.02, y: -2 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    onClick={() => handleNavigation('/Translator')}
-                                >
-                                    Explore Xperio Translator
-                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                </motion.button>
-                            </div>
-                        </motion.div>
-                        
-                        {/* Card 4: Xperio Premium */}
-                        <motion.div 
-                            className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 hover:shadow-3xl transition-all duration-500 group relative"
-                            whileHover={{ scale: 1.02, y: -10 }}
-                        >
-                            {/* Premium Badge */}
-                            <div className="absolute top-6 right-6 z-10">
-                                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 shadow-lg">
-                                    <Crown className="w-4 h-4" />
-                                    Premium
-                                </div>
-                            </div>
-                            
-                            {/* Image */}
-                            <div className="relative h-64 overflow-hidden">
-                                <img 
-                                    src="/pictures_homepage/premium.png" 
-                                    alt="Premium features and exclusive content" 
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                />
-                                {/* Icon Overlay */}
-                                <div className="absolute top-6 left-6 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl p-4 shadow-xl group-hover:scale-110 transition-transform duration-300">
-                                    <Crown className="w-6 h-6 text-white" />
-                                </div>
-                            </div>
-                            
-                            {/* Content */}
-                            <div className="p-8">
-                                <h3 className="text-3xl font-display font-bold text-gray-900 mb-4">
-                                    Xperio Premium
-                                </h3>
-                                <p className="text-lg text-gray-600 mb-6 leading-relaxed font-body">
-                                    Unlock exclusive content, offline access, and premium features for the ultimate travel experience.
-                                </p>
-                                
-                                {/* Feature Tags */}
-                                <div className="flex flex-wrap gap-3 mb-6">
-                                    {['Exclusive Content', 'Offline Access', 'Premium Support'].map((tag, index) => (
-                                        <span key={tag} className="bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-800 px-4 py-2 rounded-full font-semibold text-sm hover:scale-105 transition-transform cursor-pointer">
-                                            {tag}
-                                        </span>
-                                    ))}
-                                </div>
-                                
-                                {/* Action Button */}
-                                <motion.button 
-                                    className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 group"
-                                    whileHover={{ scale: 1.02, y: -2 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    onClick={() => handleNavigation('/Premium')}
-                                >
-                                    Explore Xperio Premium
-                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                </motion.button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                </div>
-            </div>
+                </section>
 
-            {/* Enhanced Testimonials Section */}
-            <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-20">
-                <div className="max-w-7xl mx-auto px-6">
-                    <motion.div 
-                        className="text-center mb-16"
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8 }}
-                    >
-                        <h2 className="text-4xl lg:text-5xl font-display font-bold mb-6 text-gray-900">
-                            What Our Users Say
-                        </h2>
-                        <p className="text-xl text-gray-600 max-w-3xl mx-auto font-body">
-                            From exploring local gems to global adventures, 2000+ happy clients and still counting.
-                        </p>
-                    </motion.div>
-
-                    <motion.div 
-                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-                        initial={{ opacity: 0, y: 50 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                    >
-                        {testimonials.map((testimonial, index) => (
+                {/* Enhanced Stats Section */}
+                <motion.section
+                    className="stats-section"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    onViewportEnter={() => setStatsVisible(true)}
+                    viewport={{ once: true }}
+                >
+                    <div className="stats-container">
+                        <motion.div 
+                            className="stats-grid"
+                            variants={staggerContainer}
+                            initial="hidden"
+                            whileInView="show"
+                            viewport={{ once: true }}
+                        >
                             <motion.div
-                                key={index}
-                                className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-500 group"
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: index * 0.1, duration: 0.6 }}
-                                whileHover={{ scale: 1.03, y: -5 }}
+                                className="stat-card"
+                                variants={staggerItem}
+                                whileHover={{ 
+                                    y: -10, 
+                                    scale: 1.05,
+                                    transition: { duration: 0.3 }
+                                }}
                             >
-                                <div className="flex mb-6">
-                                    {[...Array(testimonial.rating)].map((_, i) => (
-                                        <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                                    ))}
-                                </div>
-                                <p className="text-gray-700 mb-6 font-body leading-relaxed text-lg italic">
-                                    "{testimonial.message}"
-                                </p>
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                                        {testimonial.name.charAt(0)}
-                                    </div>
-                                    <div>
-                                        <p className="font-heading font-bold text-gray-900">{testimonial.name}</p>
-                                        <p className="text-gray-600 font-body">{testimonial.role}</p>
-                                    </div>
-                                </div>
+                                <motion.div 
+                                    className="stat-icon"
+                                    whileHover={{ 
+                                        rotate: 360,
+                                        transition: { duration: 0.6 }
+                                    }}
+                                >
+                                    <Users className="icon" />
+                                </motion.div>
+                                <motion.div 
+                                    className="stat-number"
+                                    initial={{ opacity: 0, scale: 0.5 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    transition={{ duration: 0.5, delay: 0.2 }}
+                                >
+                                    {userCount.toLocaleString()}+
+                                </motion.div>
+                                <div className="stat-label">Happy Travelers</div>
                             </motion.div>
-                        ))}
-                    </motion.div>
-                </div>
-            </section>
+
+                            <motion.div
+                                className="stat-card"
+                                variants={staggerItem}
+                                whileHover={{ 
+                                    y: -10, 
+                                    scale: 1.05,
+                                    transition: { duration: 0.3 }
+                                }}
+                            >
+                                <motion.div 
+                                    className="stat-icon"
+                                    whileHover={{ 
+                                        rotate: 360,
+                                        transition: { duration: 0.6 }
+                                    }}
+                                >
+                                    <MapPin className="icon" />
+                                </motion.div>
+                                <motion.div 
+                                    className="stat-number"
+                                    initial={{ opacity: 0, scale: 0.5 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    transition={{ duration: 0.5, delay: 0.3 }}
+                                >
+                                    {cityCount}+
+                                </motion.div>
+                                <div className="stat-label">Cities Covered</div>
+                            </motion.div>
+
+                            <motion.div
+                                className="stat-card"
+                                variants={staggerItem}
+                                whileHover={{ 
+                                    y: -10, 
+                                    scale: 1.05,
+                                    transition: { duration: 0.3 }
+                                }}
+                            >
+                                <motion.div 
+                                    className="stat-icon"
+                                    whileHover={{ 
+                                        rotate: 360,
+                                        transition: { duration: 0.6 }
+                                    }}
+                                >
+                                    <Star className="icon" />
+                                </motion.div>
+                                <motion.div 
+                                    className="stat-number"
+                                    initial={{ opacity: 0, scale: 0.5 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    transition={{ duration: 0.5, delay: 0.4 }}
+                                >
+                                    {reviewCount.toLocaleString()}+
+                                </motion.div>
+                                <div className="stat-label">5-Star Reviews</div>
+                            </motion.div>
+
+                            <motion.div
+                                className="stat-card"
+                                variants={staggerItem}
+                                whileHover={{ 
+                                    y: -10, 
+                                    scale: 1.05,
+                                    transition: { duration: 0.3 }
+                                }}
+                            >
+                                <motion.div 
+                                    className="stat-icon"
+                                    whileHover={{ 
+                                        rotate: 360,
+                                        transition: { duration: 0.6 }
+                                    }}
+                                >
+                                    <Award className="icon" />
+                                </motion.div>
+                                <motion.div 
+                                    className="stat-number"
+                                    initial={{ opacity: 0, scale: 0.5 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    transition={{ duration: 0.5, delay: 0.5 }}
+                                >
+                                    99.9%
+                                </motion.div>
+                                <div className="stat-label">Uptime</div>
+                            </motion.div>
+                        </motion.div>
+                    </div>
+                </motion.section>
+
+                {/* Enhanced Testimonials Section */}
+                <section className="testimonials-section">
+                    <div className="testimonials-container">
+                        <motion.div
+                            className="section-header"
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                        >
+                            <h2 className="section-title">Loved by Travelers Worldwide</h2>
+                            <p className="section-subtitle">
+                                Join thousands of happy travelers who trust Xperio for their adventures
+                            </p>
+                        </motion.div>
+
+                        <div className="testimonials-grid">
+                            <AnimatePresence mode="wait">
+                                {testimonials.slice(currentTestimonial, currentTestimonial + 2).map((testimonial, index) => (
+                                    <motion.div
+                                        key={`${currentTestimonial}-${index}`}
+                                        className="testimonial-card"
+                                        initial={{ opacity: 0, y: 50, rotateX: -15 }}
+                                        animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                                        exit={{ opacity: 0, y: -50, rotateX: 15 }}
+                                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                                        whileHover={{ 
+                                            y: -10, 
+                                            scale: 1.02,
+                                            transition: { duration: 0.3 }
+                                        }}
+                                    >
+                                        <div className="testimonial-content">
+                                            <div className="testimonial-header">
+                                                <motion.div 
+                                                    className="testimonial-stars"
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                    transition={{ delay: 0.3 }}
+                                                >
+                                                    {[...Array(testimonial.rating)].map((_, i) => (
+                                                        <motion.div
+                                                            key={i}
+                                                            initial={{ opacity: 0, scale: 0 }}
+                                                            animate={{ opacity: 1, scale: 1 }}
+                                                            transition={{ delay: 0.5 + i * 0.1 }}
+                                                        >
+                                                            <Star className="star-testimonial" />
+                                                        </motion.div>
+                                                    ))}
+                                                </motion.div>
+                                                <div className="testimonial-date">{testimonial.date}</div>
+                                            </div>
+                                            <motion.blockquote 
+                                                className="testimonial-text"
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                transition={{ delay: 0.4 }}
+                                            >
+                                                "{testimonial.message}"
+                                            </motion.blockquote>
+                                            <motion.div 
+                                                className="testimonial-author"
+                                                initial={{ opacity: 0, x: -20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: 0.6 }}
+                                            >
+                                                <motion.img
+                                                    src={testimonial.avatar}
+                                                    alt={testimonial.name}
+                                                    className="author-avatar"
+                                                    whileHover={{ scale: 1.1 }}
+                                                    transition={{ duration: 0.3 }}
+                                                />
+                                                <div className="author-info">
+                                                    <div className="author-name">{testimonial.name}</div>
+                                                    <div className="author-role">{testimonial.role}</div>
+                                                    <div className="author-location">
+                                                        <MapPin className="location-icon" />
+                                                        <span>{testimonial.location}</span>
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Enhanced CTA Section */}
+                <section className="cta-section">
+                    <div className="cta-container">
+                        <motion.div
+                            className="cta-content"
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8 }}
+                        >
+                            <motion.div 
+                                className="cta-badge"
+                                whileHover={{ scale: 1.1 }}
+                            >
+                                <Plane className="badge-icon" />
+                                <span>Ready for Your Next Adventure?</span>
+                            </motion.div>
+                            <h2 className="cta-title">Start Your Journey Today</h2>
+                            <p className="cta-subtitle">
+                                Join over 250,000 travelers who trust Xperio to make their adventures unforgettable
+                            </p>
+                            <motion.div 
+                                className="cta-actions"
+                                variants={staggerContainer}
+                                initial="hidden"
+                                whileInView="show"
+                                viewport={{ once: true }}
+                            >
+                                <motion.button
+                                    className="cta-primary large"
+                                    variants={staggerItem}
+                                    whileHover={{ 
+                                        scale: 1.05, 
+                                        y: -3,
+                                        boxShadow: "0 20px 40px rgba(102, 126, 234, 0.6)"
+                                    }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={() => handleNavigation('/signup')}
+                                >
+                                    <span>Get Started Free</span>
+                                    <motion.div
+                                        animate={{ x: [0, 5, 0] }}
+                                        transition={{ duration: 1.5, repeat: Infinity }}
+                                    >
+                                        <ArrowRight className="cta-icon" />
+                                    </motion.div>
+                                </motion.button>
+                                <motion.button
+                                    className="cta-secondary large"
+                                    variants={staggerItem}
+                                    whileHover={{ 
+                                        scale: 1.05, 
+                                        y: -3,
+                                        backgroundColor: "rgba(255, 255, 255, 0.2)"
+                                    }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={() => handleNavigation('/premium')}
+                                >
+                                    <Crown className="cta-icon" />
+                                    <span>Try Premium</span>
+                                </motion.button>
+                            </motion.div>
+                        </motion.div>
+                    </div>
+                </section>
+            </div>
+
+            {/* Enhanced Chatbot Widget - Bottom Left */}
+            <ChatbotWidget />
 
             <Footer />
         </>
