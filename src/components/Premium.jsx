@@ -44,7 +44,7 @@ export default function Premium() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 text-gray-800 px-6 md:px-20 py-10">
+      <div className="premium-page-container min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 text-gray-800 px-6 md:px-20 py-10">
         {/* Hero Section */}
         <motion.div
           className="text-center mb-20"
@@ -94,16 +94,22 @@ export default function Premium() {
             transition={{ duration: 0.7, delay: 0.8 }}
           >
             <motion.div
-              className="relative overflow-hidden rounded-2xl shadow-2xl"
+              className="premium-video-container relative"
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 120 }}
             >
-              <img
-                src=""
-                alt="Premium Banner"
-                className="w-full max-w-4xl h-80 object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+              <video
+                src="/videos/premium-banner.mp4"
+                className="premium-video"
+                autoPlay
+                muted
+                loop
+                playsInline
+                controls={false}
+              >
+                Your browser does not support the video tag.
+              </video>
+              <div className="premium-video-overlay"></div>
             </motion.div>
           </motion.div>
         </motion.div>
@@ -319,19 +325,19 @@ export default function Premium() {
               {
                 name: "Sarah Chen",
                 role: "Travel Blogger",
-                content: '"Upgraded for the offline maps – lifesaver in Bali! Loved the exclusive stories too."',
+                content: "Upgraded for the offline maps – lifesaver in Bali! Loved the exclusive stories too.",
                 rating: 5
               },
               {
                 name: "Mario Garcia",
                 role: "Business Traveler",
-                content: '"The translator and itinerary AI helped me a lot in Japan. Totally worth it."',
+                content: "The translator and itinerary AI helped me a lot in Japan. Totally worth it.",
                 rating: 5
               },
               {
                 name: "Jessica Kim",
                 role: "Adventure Seeker",
-                content: '"Loved the assistant and discounts! Made my Europe trip so smooth."',
+                content: "Loved the assistant and discounts! Made my Europe trip so smooth.",
                 rating: 5
               }
             ].map((testimonial, index) => (
@@ -363,7 +369,7 @@ export default function Premium() {
 
         {/* FAQs */}
         <motion.div
-          className="mb-16 max-w-4xl mx-auto"
+          className="premium-faqs max-w-4xl mx-auto"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -385,8 +391,10 @@ export default function Premium() {
           </div>
         </motion.div>
 
-        {/* Enhanced Footer */}
-        <Footer />
+        {/* Footer */}
+        <div className="premium-footer">
+          <Footer />
+        </div>
       </div>
     </>
   );

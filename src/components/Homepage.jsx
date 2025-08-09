@@ -12,13 +12,18 @@ export function Homepage() {
         { label: "Culture", url: "/Culture" },
         { label: "Translator", url: "/Translator" },
         { label: "Premium", url: "/Premium" }
-      ];
-      const navigate = useNavigate();
+    ];
+    const navigate = useNavigate();
     const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
         setIsLoaded(true);
     }, []);
+
+    // Navigation handler
+    const handleNavigation = (url) => {
+        navigate(url);
+    };
     
     const testimonials = [
         {
@@ -139,6 +144,7 @@ export function Homepage() {
                                     className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-4 rounded-2xl font-bold text-xl shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center gap-3 group"
                                     whileHover={{ scale: 1.05, y: -3 }}
                                     whileTap={{ scale: 0.95 }}
+                                    onClick={() => handleNavigation('/Food')}
                                 >
                                     Start Exploring
                                     <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
@@ -148,6 +154,7 @@ export function Homepage() {
                                     className="bg-white text-gray-800 px-8 py-4 rounded-2xl font-bold text-xl border-2 border-gray-300 hover:border-gray-400 transition-all duration-300 flex items-center justify-center gap-3 group shadow-lg hover:shadow-xl"
                                     whileHover={{ scale: 1.05, y: -3 }}
                                     whileTap={{ scale: 0.95 }}
+                                    onClick={() => handleNavigation('/Premium')}
                                 >
                                     <Play className="w-6 h-6" />
                                     Watch Demo
@@ -214,7 +221,7 @@ export function Homepage() {
                         </h2>
                         
                         <p className="text-xl lg:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed font-body">
-                            Six powerful modules designed to enhance every aspect of your cultural food journey
+                            Four powerful modules designed to enhance every aspect of your cultural food journey
                         </p>
                     </motion.div>
                     
@@ -267,6 +274,7 @@ export function Homepage() {
                                     className="w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 group"
                                     whileHover={{ scale: 1.02, y: -2 }}
                                     whileTap={{ scale: 0.98 }}
+                                    onClick={() => handleNavigation('/Food')}
                                 >
                                     Explore Xperio Food
                                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -315,6 +323,7 @@ export function Homepage() {
                                     className="w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 group"
                                     whileHover={{ scale: 1.02, y: -2 }}
                                     whileTap={{ scale: 0.98 }}
+                                    onClick={() => handleNavigation('/Culture')}
                                 >
                                     Explore Xperio Culture
                                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -363,6 +372,7 @@ export function Homepage() {
                                     className="w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 group"
                                     whileHover={{ scale: 1.02, y: -2 }}
                                     whileTap={{ scale: 0.98 }}
+                                    onClick={() => handleNavigation('/Translator')}
                                 >
                                     Explore Xperio Translator
                                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -419,6 +429,7 @@ export function Homepage() {
                                     className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 group"
                                     whileHover={{ scale: 1.02, y: -2 }}
                                     whileTap={{ scale: 0.98 }}
+                                    onClick={() => handleNavigation('/Premium')}
                                 >
                                     Explore Xperio Premium
                                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -487,7 +498,7 @@ export function Homepage() {
                 </div>
             </section>
 
-                        <Footer />
+            <Footer />
         </>
     );
 }

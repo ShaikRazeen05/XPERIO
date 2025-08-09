@@ -1,386 +1,564 @@
-import React, { useState } from 'react';
-import { FaGoogle, FaApple } from 'react-icons/fa';
-import {
-  MdEmail,
-  MdLanguage,
-  MdHistory,
-  MdBookmark,
-  MdFeedback,
-  MdSubscriptions,
-  MdSupport,
-} from 'react-icons/md';
-
-import { FaGlobe } from 'react-icons/fa';
-import { HiSparkles } from 'react-icons/hi2'; // not "hi", but "hi2"
-
+import React, { useState, useEffect } from 'react';
+import { FaGoogle, FaApple, FaGlobe } from 'react-icons/fa';
+import { HiSparkles } from 'react-icons/hi2';
+import { MdEmail, MdLock, MdHistory, MdBookmark, MdSubscriptions, MdSupport } from 'react-icons/md';
 import { motion } from 'framer-motion';
 
-const bgImage = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80'; // Soft travel/culture background
+const LoginPage = () => {
+    const [currentUser, setCurrentUser] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [errors, setErrors] = useState({});
+    const [formData, setFormData] = useState({
+        username: '',
+        password: '',
+        rememberMe: false
+    });
 
-export default function Loginpage() {
-  // Demo authentication state
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [user, setUser] = useState(null);
-  const [error, setError] = useState('');
+    useEffect(() => {
+        // Set body classes
+        document.body.classList.add('login-mode');
+        document.body.classList.remove('dashboard-mode');
+        
+        // Check existing session
+        checkExistingSession();
+        
+        return () => {
+            document.body.classList.remove('login-mode');
+        };
+    }, []);
 
-  // Demo login handler
-  const handleLogin = (e) => {
-    e.preventDefault();
-    if (username.trim() && password.trim()) {
-      setUser({ name: username });
-      setIsLoggedIn(true);
-      setError('');
-    } else {
-      setError('Please enter both username and password.');
-    }
-  };
+    const handleInputChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
 
-  // Demo social login
-  const handleSocialLogin = (provider) => {
-    setUser({ name: provider === 'google' ? 'Google User' : 'Apple User' });
-    setIsLoggedIn(true);
-    setError('');
-  };
+        // Clear error when user starts typing
+        if (errors[name]) {
+            setErrors(prev => ({
+                ...prev,
+                [name]: ''
+            }));
+        }
+    };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUser(null);
-    setUsername('');
-    setPassword('');
-    setError('');
-  };
+    const validateForm = () => {
+        const newErrors = {};
+        
+        if (!formData.username.trim()) {
+            newErrors.username = 'Username or email is required';
+        } else if (!isValidEmail(formData.username) && formData.username.length < 3) {
+            newErrors.username = 'Please enter a valid email or username (min 3 characters)';
+        }
+        
+        if (!formData.password) {
+            newErrors.password = 'Password is required';
+        } else if (formData.password.length < 6) {
+            newErrors.password = 'Password must be at least 6 characters long';
+        }
+        
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
-  if (isLoggedIn && user) {
-    // --- Demo Data ---
-    const demoBookmarks = [
-      { id: 1, name: 'Taj Mahal', type: 'Place' },
-      { id: 2, name: 'Pav Bhaji', type: 'Food' },
-      { id: 3, name: 'Eiffel Tower', type: 'Place' },
-    ];
-    const demoHistory = [
-      { id: 1, action: 'Visited', item: 'Kathak Dance', date: '2024-06-01' },
-      { id: 2, action: 'Searched', item: 'Street Food Mumbai', date: '2024-05-30' },
-      { id: 3, action: 'Viewed', item: 'Holi Festival', date: '2024-05-28' },
-    ];
-    const demoSubscription = { status: 'Premium', renewal: '2024-12-31' };
+    const isValidEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
 
-    // --- Dashboard UI ---
-    return (
-      <div
-        className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50"
-        style={{
-          backgroundImage: `linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url('${bgImage}')`,
-        }}
-      >
-        <div className="max-w-7xl mx-auto p-6">
-          {/* Header */}
-          <motion.div
-            className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-10 mb-12 border border-white/20"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: 'easeOut' }}
-          >
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <motion.h2 
-                  className="text-4xl lg:text-5xl font-display font-bold mb-4 text-gray-800"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2, duration: 0.6 }}
-                >
-                  Welcome back, {user.name}! 👋
-                </motion.h2>
-                <motion.p 
-                  className="text-xl text-gray-600 font-body leading-relaxed"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4, duration: 0.6 }}
-                >
-                  Here's what's happening with your Xperio account.
-                </motion.p>
-              </div>
-              <motion.button 
-                onClick={handleLogout} 
-                className="px-8 py-4 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl font-bold text-lg hover:shadow-xl transition-all duration-300"
-                whileHover={{ scale: 1.05, y: -3 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Logout
-              </motion.button>
-            </div>
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        
+        if (isLoading) return;
+        
+        if (!validateForm()) return;
+        
+        const { username, password, rememberMe } = formData;
+        
+        setIsLoading(true);
+        
+        try {
+            const result = await authenticateUser(username, password);
             
-            {/* Stats Cards */}
-            <motion.div 
-              className="grid grid-cols-1 md:grid-cols-3 gap-8"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.6 }}
-            >
-              <motion.div 
-                className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-8 rounded-3xl shadow-xl"
-                whileHover={{ scale: 1.05, y: -5 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-purple-100 font-medium mb-2">Total Bookmarks</p>
-                    <p className="text-4xl font-display font-bold">{demoBookmarks.length}</p>
-                  </div>
-                  <MdBookmark className="text-5xl text-purple-200" />
-                </div>
-              </motion.div>
-              <motion.div 
-                className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-8 rounded-3xl shadow-xl"
-                whileHover={{ scale: 1.05, y: -5 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-blue-100 font-medium mb-2">Recent Activity</p>
-                    <p className="text-4xl font-display font-bold">{demoHistory.length}</p>
-                  </div>
-                  <MdHistory className="text-5xl text-blue-200" />
-                </div>
-              </motion.div>
-              <motion.div 
-                className="bg-gradient-to-r from-green-500 to-green-600 text-white p-8 rounded-3xl shadow-xl"
-                whileHover={{ scale: 1.05, y: -5 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-green-100 font-medium mb-2">Subscription</p>
-                    <p className="text-4xl font-display font-bold">{demoSubscription.status}</p>
-                  </div>
-                  <MdSubscriptions className="text-5xl text-green-200" />
-                </div>
-              </motion.div>
-            </motion.div>
-          </motion.div>
+            if (result.success) {
+                setCurrentUser(result.user);
+                
+                if (rememberMe) {
+                    saveUserSession(result.user);
+                }
+                
+                showToast('Login successful! Welcome back!', 'success');
+                
+            } else {
+                handleAuthError(result.error);
+            }
+            
+        } catch (error) {
+            console.error('Login error:', error);
+            showToast('Network error. Please check your connection and try again.', 'error');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-          {/* Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Bookmarks Section */}
-            <motion.div
-              className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/20"
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.8, duration: 0.6 }}
-            >
-              <div className="flex items-center gap-4 mb-8">
-                <div className="bg-gradient-to-r from-purple-100 to-purple-200 p-4 rounded-2xl">
-                  <MdBookmark className="text-3xl text-purple-600" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-display font-bold text-gray-800">Your Bookmarks</h3>
-                  <p className="text-gray-600 font-body">Saved places and experiences</p>
-                </div>
-              </div>
-              <div className="space-y-4">
-                {demoBookmarks.map(b => (
-                  <motion.div 
-                    key={b.id} 
-                    className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl hover:from-gray-100 hover:to-gray-200 transition-all duration-300"
-                    whileHover={{ scale: 1.02, x: 5 }}
-                  >
-                    <div className={`w-4 h-4 rounded-full ${b.type === 'Place' ? 'bg-blue-500' : 'bg-orange-500'}`}></div>
-                    <div className="flex-1">
-                      <p className="font-bold text-gray-800 text-lg">{b.name}</p>
-                      <p className="text-gray-500 font-body">{b.type}</p>
+    const authenticateUser = async (username, password) => {
+        await new Promise(resolve => setTimeout(resolve, 1200));
+        
+        const validUsers = {
+            'admin@example.com': { 
+                password: 'admin123', 
+                name: 'Admin User',
+                avatar: 'default-user',
+                role: 'admin'
+            },
+            'user@example.com': { 
+                password: 'user123', 
+                name: 'Regular User',
+                avatar: 'google-user',
+                role: 'user'
+            },
+            'demo@example.com': { 
+                password: 'demo123', 
+                name: 'Demo User',
+                avatar: 'apple-user',
+                role: 'demo'
+            }
+        };
+
+        const user = validUsers[username.toLowerCase()];
+        
+        if (user && user.password === password) {
+            return {
+                success: true,
+                user: {
+                    email: username,
+                    name: user.name,
+                    avatar: user.avatar,
+                    role: user.role,
+                    loginTime: new Date().toISOString(),
+                    sessionId: generateSessionId()
+                }
+            };
+        } else {
+            return {
+                success: false,
+                error: validUsers[username.toLowerCase()] ? 'invalid_credentials' : 'user_not_found'
+            };
+        }
+    };
+
+    const handleAuthError = (errorType) => {
+        switch (errorType) {
+            case 'invalid_credentials':
+                setErrors({
+                    username: 'Invalid credentials',
+                    password: 'Invalid credentials'
+                });
+                showToast('Invalid username or password. Please try again.', 'error');
+                break;
+            case 'user_not_found':
+                setErrors({ username: 'User not found' });
+                showToast('No account found with this username/email.', 'error');
+                break;
+            default:
+                showToast('Login failed. Please check your credentials and try again.', 'error');
+        }
+    };
+
+    const handleSocialLogin = (provider) => {
+        console.log(`${provider} login initiated`);
+        showToast(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login coming soon!`, 'info');
+        
+        if (provider === 'google') {
+            setTimeout(() => {
+                const mockUser = {
+                    email: 'user@gmail.com',
+                    name: 'Google User',
+                    avatar: 'google-user',
+                    role: 'user',
+                    loginTime: new Date().toISOString(),
+                    sessionId: generateSessionId()
+                };
+                setCurrentUser(mockUser);
+            }, 1000);
+        }
+    };
+
+    const handleLogout = () => {
+        setCurrentUser(null);
+        setFormData({ username: '', password: '', rememberMe: false });
+        setErrors({});
+        localStorage.removeItem('userSession');
+        
+        document.body.classList.add('login-mode');
+        document.body.classList.remove('dashboard-mode');
+        
+        showToast('Logged out successfully', 'success');
+    };
+
+    const saveUserSession = (user) => {
+        try {
+            const sessionData = {
+                user: user,
+                timestamp: Date.now(),
+                rememberMe: true,
+                sessionId: user.sessionId
+            };
+            localStorage.setItem('userSession', JSON.stringify(sessionData));
+        } catch (error) {
+            console.error('Failed to save user session:', error);
+        }
+    };
+
+    const checkExistingSession = () => {
+        try {
+            const sessionData = localStorage.getItem('userSession');
+            if (!sessionData) return;
+
+            const session = JSON.parse(sessionData);
+            const oneWeek = 7 * 24 * 60 * 60 * 1000;
+            
+            if (session.rememberMe && session.timestamp && (Date.now() - session.timestamp < oneWeek)) {
+                setCurrentUser(session.user);
+            } else {
+                localStorage.removeItem('userSession');
+            }
+        } catch (error) {
+            console.error('Session validation error:', error);
+            localStorage.removeItem('userSession');
+        }
+    };
+
+    const showToast = (message, type = 'info') => {
+        if (type === 'error') {
+            alert(`❌ ${message}`);
+        } else if (type === 'success') {
+            alert(`✅ ${message}`);
+        } else {
+            alert(`ℹ️ ${message}`);
+        }
+    };
+
+    const generateSessionId = () => {
+        return 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    };
+
+    const getInitials = (name) => {
+        if (!name) return '?';
+        return name.split(' ')
+            .filter(n => n.length > 0)
+            .map(n => n[0])
+            .join('')
+            .toUpperCase()
+            .slice(0, 2);
+    };
+
+    // Dashboard Component
+    const Dashboard = ({ user, onLogout }) => (
+        <div className="dashboard-container">
+            <div className="dashboard-background">
+                <div className="dashboard-content">
+                    <div className="dashboard-header-card">
+                        <div className="dashboard-header">
+                            <div className="user-welcome">
+                                <div className={`user-avatar ${user.avatar}`} data-initials={getInitials(user.name)}></div>
+                                <div className="welcome-text">
+                                    <h1 className="welcome-title">Welcome back, {user.name.split(' ')[0]}!</h1>
+                                    <p className="welcome-subtitle">Ready to explore your dashboard</p>
+                                </div>
+                            </div>
+                            <button className="logout-btn" onClick={onLogout}>
+                                <span>Logout</span>
+                            </button>
+                        </div>
                     </div>
-                    <button className="text-purple-600 hover:text-purple-800 font-bold">View</button>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
 
-            {/* History Section */}
-            <motion.div
-              className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/20"
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 1.0, duration: 0.6 }}
-            >
-              <div className="flex items-center gap-4 mb-8">
-                <div className="bg-gradient-to-r from-blue-100 to-blue-200 p-4 rounded-2xl">
-                  <MdHistory className="text-3xl text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-display font-bold text-gray-800">Recent Activity</h3>
-                  <p className="text-gray-600 font-body">Your latest interactions</p>
-                </div>
-              </div>
-              <div className="space-y-4">
-                {demoHistory.map(h => (
-                  <motion.div 
-                    key={h.id} 
-                    className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl"
-                    whileHover={{ scale: 1.02, x: 5 }}
-                  >
-                    <div className={`w-3 h-3 rounded-full ${h.action === 'Visited' ? 'bg-green-500' : h.action === 'Searched' ? 'bg-blue-500' : 'bg-purple-500'}`}></div>
-                    <div className="flex-1">
-                      <p className="font-bold text-gray-800 text-lg">{h.item}</p>
-                      <p className="text-gray-500 font-body">{h.action} • {h.date}</p>
+                    <div className="stats-grid">
+                        <div className="stat-card stat-purple">
+                            <div className="stat-content">
+                                <div className="stat-text">
+                                    <div className="stat-label">Total Bookmarks</div>
+                                    <div className="stat-value">1,234</div>
+                                </div>
+                                <div className="stat-icon">👥</div>
+                            </div>
+                        </div>
+                        <div className="stat-card stat-blue">
+                            <div className="stat-content">
+                                <div className="stat-text">
+                                    <div className="stat-label">Active Sessions</div>
+                                    <div className="stat-value">89</div>
+                                </div>
+                                <div className="stat-icon">📊</div>
+                            </div>
+                        </div>
+                        <div className="stat-card stat-green">
+                            <div className="stat-content">
+                                <div className="stat-text">
+                                    <div className="stat-label">Revenue</div>
+                                    <div className="stat-value">$12.4K</div>
+                                </div>
+                                <div className="stat-icon">💰</div>
+                            </div>
+                        </div>
                     </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
 
-            {/* Subscription Section */}
-            <motion.div
-              className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/20"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2, duration: 0.6 }}
-            >
-              <div className="flex items-center gap-4 mb-8">
-                <div className="bg-gradient-to-r from-green-100 to-green-200 p-4 rounded-2xl">
-                  <MdSubscriptions className="text-3xl text-green-600" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-display font-bold text-gray-800">Subscription</h3>
-                  <p className="text-gray-600 font-body">Manage your plan</p>
-                </div>
-              </div>
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-8 rounded-3xl border-2 border-green-200">
-                <div className="flex items-center justify-between mb-6">
-                  <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-lg px-6 py-2 rounded-full font-bold">{demoSubscription.status}</span>
-                  <span className="text-lg text-gray-600 font-body">Renews {demoSubscription.renewal}</span>
-                </div>
-                <motion.button 
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 rounded-2xl font-bold text-lg hover:shadow-xl transition-all duration-300"
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Manage Subscription
-                </motion.button>
-              </div>
-            </motion.div>
+                    <div className="dashboard-grid">
+                        {/* Recent Activity Card */}
+                        <div className="dashboard-card">
+                            <div className="card-header">
+                                <div className="card-icon purple">📈</div>
+                                <div className="card-title-section">
+                                    <h3 className="card-title">Recent Activity</h3>
+                                    <p className="card-subtitle">Latest updates and changes</p>
+                                </div>
+                            </div>
+                            <div className="card-list">
+                                <div className="list-item">
+                                    <div className="list-emoji">✅</div>
+                                    <div className="list-indicator blue"></div>
+                                    <div className="list-content">
+                                        <div className="list-title">Profile Updated</div>
+                                        <div className="list-meta">2 hours ago</div>
+                                    </div>
+                                    <button className="list-action" onClick={() => showToast('View clicked! Feature coming soon.', 'info')}>View</button>
+                                </div>
+                                <div className="list-item">
+                                    <div className="list-emoji">📧</div>
+                                    <div className="list-indicator green"></div>
+                                    <div className="list-content">
+                                        <div className="list-title">Email Sent</div>
+                                        <div className="list-meta">5 hours ago</div>
+                                    </div>
+                                    <button className="list-action" onClick={() => showToast('View clicked! Feature coming soon.', 'info')}>View</button>
+                                </div>
+                                <div className="list-item">
+                                    <div className="list-emoji">🔐</div>
+                                    <div className="list-indicator orange"></div>
+                                    <div className="list-content">
+                                        <div className="list-title">Security Update</div>
+                                        <div className="list-meta">1 day ago</div>
+                                    </div>
+                                    <button className="list-action" onClick={() => showToast('View clicked! Feature coming soon.', 'info')}>View</button>
+                                </div>
+                            </div>
+                        </div>
 
-            {/* Support Section */}
-            <motion.div
-              className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/20"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.4, duration: 0.6 }}
-            >
-              <div className="flex items-center gap-4 mb-8">
-                <div className="bg-gradient-to-r from-orange-100 to-orange-200 p-4 rounded-2xl">
-                  <MdSupport className="text-3xl text-orange-600" />
+                        {/* Subscription Card */}
+                        <div className="dashboard-card">
+                            <div className="card-header">
+                                <div className="card-icon green">💎</div>
+                                <div className="card-title-section">
+                                    <h3 className="card-title">Subscription</h3>
+                                    <p className="card-subtitle">Manage your plan and billing</p>
+                                </div>
+                            </div>
+                            <div className="subscription-content">
+                                <div className="subscription-info">
+                                    <span className="subscription-badge">Pro Plan</span>
+                                    <span className="subscription-renewal">Renews March 15, 2025</span>
+                                </div>
+                                <button className="subscription-btn" onClick={() => showToast('Manage Subscription clicked! Feature coming soon.', 'info')}>
+                                    <span className="btn-icon">⚡</span>
+                                    <span>Upgrade Plan</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Support Card */}
+                        <div className="dashboard-card">
+                            <div className="card-header">
+                                <div className="card-icon orange">🎧</div>
+                                <div className="card-title-section">
+                                    <h3 className="card-title">Help & Support</h3>
+                                    <p className="card-subtitle">We're here to help</p>
+                                </div>
+                            </div>
+                            <div className="support-content">
+                                <p className="support-text">
+                                    Need help with your account or have questions about Xperio?
+                                </p>
+                                <button className="support-btn" onClick={() => showToast('Contact Support clicked! Feature coming soon.', 'info')}>
+                                    <MdSupport className="btn-icon" />
+                                    <span>Contact Support</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                  <h3 className="text-2xl font-display font-bold text-gray-800">Help & Support</h3>
-                  <p className="text-gray-600 font-body">We're here to help</p>
-                </div>
-              </div>
-              <div className="space-y-6">
-                <p className="text-gray-600 font-body text-lg leading-relaxed">
-                  Need help with your account or have questions about Xperio?
-                </p>
-                <motion.button 
-                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 rounded-2xl font-bold text-lg hover:shadow-xl transition-all duration-300"
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <MdSupport className="inline mr-3 text-xl" /> Contact Support
-                </motion.button>
-              </div>
-            </motion.div>
-          </div>
+            </div>
         </div>
-      </div>
     );
-  }
 
-  // --- Login UI ---
-  return (
-    <div
-      className="min-h-screen flex items-center justify-center bg-fixed bg-cover bg-center"
-      style={{
-        backgroundImage: `linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), url('${bgImage}')`,
-      }}
-    >
-      <motion.div
-        className="max-w-md w-full mx-auto bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-10 border border-white/20"
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: 'easeOut' }}
-      >
-        <motion.div
-          className="text-center mb-8"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
-        >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Globe className="w-8 h-8 text-purple-500" />
-            <h2 className="text-3xl font-display font-bold text-gray-800">Sign in to your account</h2>
-            <Sparkles className="w-8 h-8 text-pink-500" />
-          </div>
-        </motion.div>
-        
-        <form onSubmit={handleLogin} className="mb-8">
-          <div className="mb-6">
-            <label className="block text-gray-700 font-bold mb-3 text-lg">Username</label>
-            <input
-              type="text"
-              className="w-full border-2 border-gray-200 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-500 text-lg font-medium transition-all duration-300"
-              value={username}
-              onChange={e => setUsername(e.target.value)}
-              autoComplete="username"
-            />
-          </div>
-          <div className="mb-6">
-            <label className="block text-gray-700 font-bold mb-3 text-lg">Password</label>
-            <input
-              type="password"
-              className="w-full border-2 border-gray-200 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-500 text-lg font-medium transition-all duration-300"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              autoComplete="current-password"
-            />
-          </div>
-          {error && <div className="text-red-500 mb-6 text-lg font-medium">{error}</div>}
-          <motion.button
-            type="submit"
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-2xl font-bold text-xl hover:shadow-xl transition-all duration-300"
-            whileHover={{ scale: 1.02, y: -2 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            Sign In
-          </motion.button>
-        </form>
-        
-        <div className="flex items-center mb-8">
-          <div className="flex-grow border-t-2 border-gray-200"></div>
-          <span className="mx-4 text-gray-400 text-lg font-medium">or</span>
-          <div className="flex-grow border-t-2 border-gray-200"></div>
-        </div>
-        
-        <div className="flex flex-col gap-4">
-          <motion.button
-            className="flex items-center justify-center gap-4 border-2 border-gray-200 py-4 px-6 rounded-2xl hover:border-purple-300 text-gray-700 font-bold text-lg transition-all duration-300 bg-white/80 backdrop-blur-sm"
-            onClick={() => handleSocialLogin('google')}
-            type="button"
-            whileHover={{ scale: 1.02, y: -2 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <FaGoogle className="text-2xl text-red-500" /> Continue with Google
-          </motion.button>
-          <motion.button
-            className="flex items-center justify-center gap-4 border-2 border-gray-200 py-4 px-6 rounded-2xl hover:border-purple-300 text-gray-700 font-bold text-lg transition-all duration-300 bg-white/80 backdrop-blur-sm"
-            onClick={() => handleSocialLogin('apple')}
-            type="button"
-            whileHover={{ scale: 1.02, y: -2 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <FaApple className="text-2xl text-gray-800" /> Continue with Apple
-          </motion.button>
-        </div>
-      </motion.div>
-    </div>
-  );
-}
+    // Render dashboard if user is logged in
+    if (currentUser) {
+        document.body.classList.add('dashboard-mode');
+        document.body.classList.remove('login-mode');
+        return <Dashboard user={currentUser} onLogout={handleLogout} />;
+    }
+
+    // Login Form
+    return (
+        <>
+            {/* Background */}
+            <div className="login-background"></div>
+            
+            {/* Main wrapper */}
+            <div className={`login-page-wrapper ${Object.keys(errors).length > 0 ? 'has-errors' : ''}`}>
+                <div className={`login-content-container ${Object.keys(errors).length > 0 ? 'has-errors' : ''}`}>
+                    <motion.div
+                        className={`login-form-wrapper ${Object.keys(errors).length > 0 ? 'has-errors' : ''}`}
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.7, ease: 'easeOut' }}
+                    >
+                        {/* Brand Header */}
+                        <div className="login-brand-header">
+                            <div className={`brand-icon-container ${Object.keys(errors).length > 0 ? 'has-errors' : ''}`}>
+                                <FaGlobe className="brand-icon globe" />
+                                <HiSparkles className="brand-icon sparkles" />
+                            </div>
+                            <h1 className={`brand-title ${Object.keys(errors).length > 0 ? 'has-errors' : ''}`}>
+                                Welcome to Xperio
+                            </h1>
+                            <p className={`brand-subtitle ${Object.keys(errors).length > 0 ? 'has-errors' : ''}`}>
+                                Sign in to explore cultures worldwide
+                            </p>
+                        </div>
+
+                        {/* Form Container */}
+                        <form onSubmit={handleLogin} className="login-form-container">
+                            {/* Input Fields Section */}
+                            <div className="input-fields-section">
+                                {/* Username Field */}
+                                <div className="form-field">
+                                    <label className={`field-label ${errors.username ? 'error' : ''}`}>
+                                        <MdEmail className="label-icon" />
+                                        Username or Email
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="username"
+                                        className={`form-input ${errors.username ? 'error' : ''}`}
+                                        value={formData.username}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter your username or email"
+                                        autoComplete="username"
+                                    />
+                                </div>
+
+                                {/* Password Field */}
+                                <div className="form-field">
+                                    <label className={`field-label ${errors.password ? 'error' : ''}`}>
+                                        <MdLock className="label-icon" />
+                                        Password
+                                    </label>
+                                    <div className="password-container">
+                                        <input
+                                            type={showPassword ? 'text' : 'password'}
+                                            name="password"
+                                            className={`form-input ${errors.password ? 'error' : ''}`}
+                                            value={formData.password}
+                                            onChange={handleInputChange}
+                                            placeholder="Enter your password"
+                                            autoComplete="current-password"
+                                        />
+                                        <button
+                                            type="button"
+                                            className={`password-toggle-btn ${errors.password ? 'error' : ''}`}
+                                            onClick={() => setShowPassword(!showPassword)}
+                                        >
+                                            {showPassword ? '👁️' : '🙈'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Form Options */}
+                            <div className="form-options-section">
+                                <label className="remember-me-checkbox">
+                                    <input
+                                        type="checkbox"
+                                        name="rememberMe"
+                                        checked={formData.rememberMe}
+                                        onChange={handleInputChange}
+                                    />
+                                    <div className="custom-checkbox"></div>
+                                    Remember me
+                                </label>
+                                <a href="#" className="forgot-password-link" onClick={(e) => {
+                                    e.preventDefault();
+                                    showToast('Password reset coming soon!', 'info');
+                                }}>
+                                    Forgot password?
+                                </a>
+                            </div>
+
+                            {/* Login Button */}
+                            <button 
+                                type="submit" 
+                                className={`primary-login-btn ${Object.keys(errors).length > 0 ? 'error-state' : ''}`}
+                                disabled={isLoading}
+                            >
+                                {isLoading ? (
+                                    <div className="loading-content">
+                                        <div className="loading-spinner"></div>
+                                        <span>Signing in...</span>
+                                    </div>
+                                ) : (
+                                    'Sign In'
+                                )}
+                            </button>
+
+                            {/* Divider */}
+                            <div className="divider-section">
+                                <div className="divider-line"></div>
+                                <span className="divider-text">or</span>
+                                <div className="divider-line"></div>
+                            </div>
+
+                            {/* Social Login */}
+                            <div className="social-login-section">
+                                <button
+                                    type="button"
+                                    className="social-login-btn google-btn"
+                                    onClick={() => handleSocialLogin('google')}
+                                >
+                                    <FaGoogle className="social-icon" />
+                                    Google
+                                </button>
+                                <button
+                                    type="button"
+                                    className="social-login-btn apple-btn"
+                                    onClick={() => handleSocialLogin('apple')}
+                                >
+                                    <FaApple className="social-icon" />
+                                    Apple
+                                </button>
+                            </div>
+
+                            {/* Footer */}
+                            <div className="login-footer-section">
+                                <p className="footer-text">
+                                    Don't have an account?
+                                    <button 
+                                        type="button"
+                                        className="signup-link-btn"
+                                        onClick={() => showToast('Signup page coming soon!', 'info')}
+                                    >
+                                        Sign up here
+                                    </button>
+                                </p>
+                            </div>
+                        </form>
+                    </motion.div>
+                </div>
+            </div>
+        </>
+    );
+};
+
+export default LoginPage;
